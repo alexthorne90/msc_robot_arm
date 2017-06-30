@@ -4,20 +4,17 @@
 
 FooClass FooObject;
 
-void setup() {
-
-	Serial.begin(115200);
+void setup()
+{
+	Serial.begin(9600);
 	delay(1000);
-
 }
 
-void loop() {
-
+void loop()
+{
 	Serial.println("Hello world");
 	FooObject.firstFooMethod();
 	delay(1000);
 	FooObject.secondFooMethod();
 	delay(1000);
-
 }
-
