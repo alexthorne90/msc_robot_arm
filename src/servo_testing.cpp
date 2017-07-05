@@ -1,14 +1,8 @@
 #include <Arduino.h>
 #include <Servo.h>
 
+//Undefine to remove debug prints
 #define DEBUG
-
-//Select which arm by uncommenting the corresponding line
-#define AL5D
-
-
-const float A = 5.75;
-const float B = 7.375;
 
 
 //Arm Servo pins
@@ -19,12 +13,17 @@ const float B = 7.375;
 #define Gripper_pin 12
 
 
-//Radians to Degrees constant
-const float rtod = 57.295779;
+//Arm dimensions (mm)
+#define BASE_HGT 67.31      //base hight 2.65"
+#define HUMERUS 146.05      //shoulder-to-elbow "bone" 5.75"
+#define ULNA 187.325        //elbow-to-wrist "bone" 7.375"
+#define GRIPPER 100.00          //gripper (incl.heavy duty wrist rotate mechanism) length 3.94"
 
-//Arm Speed Variables
-float Speed = 1.0;
-int sps = 3;
+
+//pre-calculations 
+float hum_sq = HUMERUS*HUMERUS;
+float uln_sq = ULNA*ULNA;
+
 
 //Servo Objects
 Servo Elb;
@@ -32,21 +31,6 @@ Servo Shldr;
 Servo Wrist;
 Servo Base;
 Servo Gripper;
-
-//Arm Current Pos
-float X = 4;
-float Y = 4;
-int Z = 90;
-int G = 90;
-float WA = 0;
-
-//Arm temp pos
-float tmpx = 4;
-float tmpy = 4;
-int tmpz = 90;
-int tmpg = 90;
-int tmpwr = 90;
-float tmpwa = 0;
 
 
 void setup()
@@ -62,115 +46,133 @@ void setup()
 }
 
 
-
-/*
-int Arm(float x, float y, float z, int g, float wa) //Here's all the Inverse Kinematics to control the arm
+/* arm positioning routine utilizing inverse kinematics */
+/* z is height, y is distance from base center out, x is side to side. y,z can only be positive */
+void set_arm( float x, float y, float z, float grip_angle_d )
 {
-    float M = sqrt((y*y)+(x*x));
-    if(M <= 0)
-    {
+    float grip_angle_r = radians( grip_angle_d );    //grip angle in radians for use in calculations
+    /* Base angle and radial distance from x,y coordinates */
+    float bas_angle_r = atan2( x, y );
+    float rdist = sqrt(( x * x ) + ( y * y ));
+    /* rdist is y coordinate for the arm */
+    y = rdist;
+    /* Grip offsets calculated based on grip angle */
+    float grip_off_z = ( sin( grip_angle_r )) * GRIPPER;
+    float grip_off_y = ( cos( grip_angle_r )) * GRIPPER;
+    /* Wrist position */
+    float wrist_z = ( z - grip_off_z ) - BASE_HGT;
+    float wrist_y = y - grip_off_y;
+
 #ifdef DEBUG
-        Serial.println("Negative or 0 M, return error");
+    Serial.print("Calculated wrist height = ");
+    Serial.print(wrist_z);
+    Serial.print("   and wrist depth = ");
+    Serial.println(wrist_y);
 #endif
-        return 1;
-    }
-    float A1 = atan(y/x);
-    if(x <= 0)
-    {
+
+    /* Shoulder to wrist distance ( AKA sw ) */
+    float s_w = ( wrist_z * wrist_z ) + ( wrist_y * wrist_y );
+    float s_w_sqrt = sqrt( s_w );
+    /* s_w angle to ground */
+    float a1 = atan2( wrist_z, wrist_y );
+    /* s_w angle to humerus */
+    float a2 = acos((( hum_sq - uln_sq ) + s_w ) / ( 2 * HUMERUS * s_w_sqrt ));
+
 #ifdef DEBUG
-        Serial.println("Negative or 0 x, return error");
+    Serial.print("Calculated A1 = ");
+    Serial.print(degrees(a1));
+    Serial.print("    A2 = ");
+    Serial.println(degrees(a2));
 #endif
-        return 1;
-    }
-    float A2 = acos((A*A-B*B+M*M)/((A*2)*M));
-    float Elbow = acos((A*A+B*B-M*M)/((A*2)*B));
-    float Shoulder = A1 + A2;
-    Elbow = Elbow * rtod;
-    Shoulder = Shoulder * rtod;
-    if((int)Elbow <= 0 || (int)Shoulder <= 0)
-    {
+
+    /* shoulder angle */
+    float shl_angle_r = a1 + a2;
+    float shl_angle_d = degrees( shl_angle_r );
+    /* elbow angle */
+    float elb_angle_r = acos(( hum_sq + uln_sq - s_w ) / ( 2 * HUMERUS * ULNA ));
+    float elb_angle_d = degrees( elb_angle_r );
+    float elb_angle_dn = -( 180.0 - elb_angle_d );
+    /* wrist angle */
+    float wri_angle_d = ( grip_angle_d - elb_angle_dn ) - shl_angle_d;
+
+    /* Servo pulses */
+    float bas_servopulse = 1500.0 - (( degrees( bas_angle_r )) * 9.804 );
+    float shl_servopulse = 1485.0 + (( shl_angle_d - 90.0 ) * 9.524 );
+    float elb_servopulse = 1660.0 +  (( elb_angle_d - 90.0 ) * 9.174 );
+    float wri_servopulse = 1500.0 - ( wri_angle_d  * 10.0 );
+
 #ifdef DEBUG
-        Serial.println("Negative or 0 Elbow or Shoulder, return error");
+    Serial.print("Wrote to base:  ");
+    Serial.println(bas_servopulse);
+    Serial.print("Wrote to shoulder:  ");
+    Serial.println(shl_servopulse);
+    Serial.print("Wrote to elbow:  ");
+    Serial.println(elb_servopulse);
+    Serial.print("Wrote to wrist:  ");
+    Serial.println(wri_servopulse);
 #endif
-        return 1;
-    }
-    float Wris = abs(wa - Elbow - Shoulder) - 90;
-    Elb.write(180 - Elbow);
-    Shldr.write(Shoulder);
-    Wrist.write(180 - Wris);
-    Base.write(z);
-#ifdef DEBUG
-    Serial.print("Wrote to Elb ");
-    Serial.println(180 - Elbow);
-    Serial.print("Wrote to Shldr ");
-    Serial.println(Shoulder);
-    Serial.print("Wrote to Wrist ");
-    Serial.println(180 - Wris);
-    Serial.print("Wrote to Base ");
-    Serial.println(z);
-#endif
-    Gripper.write(g);
-    Y = tmpy;
-    X = tmpx;
-    Z = tmpz;
-    WA = tmpwa;
-    G = tmpg;
-#ifdef DEBUG
-    Serial.print("Y = ");
-    Serial.println(Y);
-    Serial.print("X = ");
-    Serial.println(X);
-    Serial.print("Z = ");
-    Serial.println(Z);
-    Serial.print("WA = ");
-    Serial.println(WA);
-#endif
-    return 0;
+
+    Base.writeMicroseconds(bas_servopulse);
+    Shldr.writeMicroseconds(shl_servopulse);
+    Elb.writeMicroseconds(elb_servopulse);
+    Wrist.writeMicroseconds(wri_servopulse);
+
 }
-*/
+
 
 
 void loop()
 {
-    int incomingByte;
-    int servoSetting;
-    String servoStr;
-
-    if (Serial.available() > 0) {
-        Serial.println("");
-        Serial.println("");
-        servoStr = Serial.readString();
-
-        servoSetting = servoStr.toInt();
-        Serial.print("Servo input = ");
-        Serial.println(servoSetting);
-
-        Serial.println("Type 'g' to go or 'q' to cancel");
-        while (1)
-        {
-            incomingByte = Serial.read();
-            if (incomingByte == 'g')
-            {
-                if (servoSetting > 0 && servoSetting < 180)
-                {
-                    Serial.print("Wrote ");
-                    Serial.print(servoSetting);
-                    Serial.println(" to the servo");
-                    //Update the servo desired here
-                    Gripper.write(servoSetting);
-                }
-                else
-                {
-                    Serial.println("Invalid servo setting");
-                }
-                break;
-            }
-            else if (incomingByte == 'q')
-            {
-                Serial.println("Input cancelled, try again");
-                break;
-            }
-        }
-        delay(2000);
+    int x_coordinate;
+    int y_coordinate;
+    int z_coordinate;
+    String x_input;
+    String y_input;
+    String z_input;
+    int command;
+    delay(3000);
+    Serial.println("");
+    Serial.println("");
+    Serial.print("Input X coordinate (side to side):  ");
+    while (!(Serial.available() > 0))
+    {
     }
+    x_input = Serial.readString();
+    x_coordinate = x_input.toInt();
+    Serial.println(x_coordinate);
+
+    Serial.print("Input Y coordinate (dist from base center):  ");
+    while (!(Serial.available() > 0))
+    {
+    }
+    y_input = Serial.readString();
+    y_coordinate = y_input.toInt();
+    Serial.println(y_coordinate);
+
+    Serial.print("Input Z coordinate (height):  ");
+    while (!(Serial.available() > 0))
+    {
+    }
+    z_input = Serial.readString();
+    z_coordinate = z_input.toInt();
+    Serial.println(z_coordinate);
+    Serial.println("Type 'g' to go or 'q' to cancel");
+
+    while (1)
+    {
+        command = Serial.read();
+        if (command == 'g')
+        {
+            Serial.println("IK go!");
+            set_arm(x_coordinate, y_coordinate, z_coordinate, 0);
+            break;
+        }
+        else if (command == 'q')
+        {
+            Serial.println("Input cancelled, try again");
+            break;
+        }
+    }
+    delay(2000);
+
 }
