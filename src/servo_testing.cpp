@@ -151,13 +151,13 @@ void loop()
             incomingByte = Serial.read();
             if (incomingByte == 'g')
             {
-                if (servoSetting > 0 && servoSetting < 180)
+                if (servoSetting > 900 && servoSetting < 2100)
                 {
                     Serial.print("Wrote ");
                     Serial.print(servoSetting);
                     Serial.println(" to the servo");
                     //Update the servo desired here
-                    Gripper.write(servoSetting);
+                    Wrist.writeMicroseconds(servoSetting);
                 }
                 else
                 {
