@@ -14,13 +14,13 @@
 
 
 //Arm dimensions (mm)
-#define BASE_HGT 67.31      //base hight 2.65"
-#define HUMERUS 146.05      //shoulder-to-elbow "bone" 5.75"
-#define ULNA 187.325        //elbow-to-wrist "bone" 7.375"
-#define GRIPPER 100.00          //gripper (incl.heavy duty wrist rotate mechanism) length 3.94"
+#define BASE_HGT 69.5       //base hight 2.736"
+#define HUMERUS 146.0       //shoulder-to-elbow "bone" 5.748"
+#define ULNA 185.0          //elbow-to-wrist "bone" 7.283"
+#define GRIPPER 86.5        //gripper length to tip 3.406"
 
 
-//pre-calculations 
+//pre-calculations
 float hum_sq = HUMERUS*HUMERUS;
 float uln_sq = ULNA*ULNA;
 
