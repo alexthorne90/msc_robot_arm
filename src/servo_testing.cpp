@@ -53,11 +53,17 @@ void setup()
 {
     Serial.begin(115200);
 
-    Base.attach(Base_pin);
-    Shldr.attach(Shoulder_pin);
-    Elb.attach(Elbow_pin);
+    Base.attach(Base_pin, 553, 2425);
+    Shldr.attach(Shoulder_pin, 556, 2420);
+    Elb.attach(Elbow_pin, 556, 2410);
     Wrist.attach(Wrist_pin, 553, 2520);
     Gripper.attach(Gripper_pin);
+
+    delay(1000);
+    Base.writeMicroseconds(1510);
+    Shldr.writeMicroseconds(1485);
+    Elb.writeMicroseconds(1664);
+    Wrist.writeMicroseconds(1500);
 
 }
 
