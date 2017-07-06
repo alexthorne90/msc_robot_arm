@@ -148,6 +148,7 @@ void loop()
     int y_coordinate;
     int z_coordinate = 110;
     int sign_factor = 1;
+    int gripper_pos = 1500;
 
     //for (y_coordinate = 120; y_coordinate <= 170; y_coordinate += 5)
     //{
@@ -192,7 +193,7 @@ void loop()
     z_input = Serial.readString();
     z_coordinate = z_input.toInt();
     Serial.println(z_coordinate);
-    Serial.println("Type 'g' to go or 'q' to cancel");
+    Serial.println("Type 'g' to go or 'q' to cancel or 'c' 'o' for gipper control");
 
     while (1)
     {
@@ -207,6 +208,18 @@ void loop()
         {
             Serial.println("Input cancelled, try again");
             break;
+        }
+        else if (command == 'c')
+        {
+            gripper_pos += 25;
+            Gripper.writeMicroseconds(gripper_pos);
+            command = 0;
+        }
+        else if (command == 'o')
+        {
+            gripper_pos -= 25;
+            Gripper.writeMicroseconds(gripper_pos);
+            command = 0;
         }
     }
     delay(2000);
