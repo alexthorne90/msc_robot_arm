@@ -146,7 +146,22 @@ void loop()
 {
     int x_coordinate;
     int y_coordinate;
-    int z_coordinate;
+    int z_coordinate = 110;
+    int sign_factor = 1;
+
+    //for (y_coordinate = 120; y_coordinate <= 170; y_coordinate += 5)
+    //{
+    //    for (x_coordinate = (-60 * sign_factor); x_coordinate != (60 * sign_factor); x_coordinate += (5 * sign_factor))
+    //    {
+    //        set_arm(x_coordinate, y_coordinate, z_coordinate, -90);
+    //        delay(100);
+    //    }
+    //    sign_factor *= -1;
+    //}
+
+    //while(1);
+
+
     String x_input;
     String y_input;
     String z_input;
@@ -185,7 +200,7 @@ void loop()
         if (command == 'g')
         {
             Serial.println("IK go!");
-            set_arm(x_coordinate, y_coordinate, z_coordinate, 0);
+            set_arm(x_coordinate, y_coordinate, z_coordinate, -90);
             break;
         }
         else if (command == 'q')
