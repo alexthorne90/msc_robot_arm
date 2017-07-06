@@ -62,8 +62,8 @@ void setup()
     delay(1000);
     Base.writeMicroseconds(1510);
     Shldr.writeMicroseconds(1485);
-    Elb.writeMicroseconds(1664);
-    Wrist.writeMicroseconds(1500);
+    Elb.writeMicroseconds(1685);
+    Wrist.writeMicroseconds(1520);
 
 }
 
