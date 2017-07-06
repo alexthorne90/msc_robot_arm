@@ -32,6 +32,18 @@ Servo Wrist;
 Servo Base;
 Servo Gripper;
 
+//Servo motor "home" positions
+#define BASE_SERVO_HOME_US      1510.0
+#define SHOULDER_SERVO_HOME_US  1485.0
+#define ELBOW_SERVO_HOME_US     1664.0
+#define WRIST_SERVO_HOME_US     1500.0
+
+//Servo angle scale factors
+#define BASE_SERVO_DEGREE_PER_US        0.1011
+#define SHOULDER_SERVO_DEGREE_PER_US    0.105
+#define ELBOW_SERVO_DEGREE_PER_US       0.0987
+#define WRIST_SERVO_DEGREE_PER_US       0.0947
+
 
 void setup()
 {
@@ -42,6 +54,11 @@ void setup()
     Elb.attach(Elbow_pin);
     Wrist.attach(Wrist_pin);
     Gripper.attach(Gripper_pin);
+
+    Base.writeMicroseconds(BASE_SERVO_HOME_US);
+    Shldr.writeMicroseconds(SHOULDER_SERVO_HOME_US);
+    Elb.writeMicroseconds(ELBOW_SERVO_HOME_US);
+    Wrist.writeMicroseconds(WRIST_SERVO_HOME_US);
 
 }
 
@@ -96,10 +113,14 @@ void set_arm( float x, float y, float z, float grip_angle_d )
     float wri_angle_d = ( grip_angle_d - elb_angle_dn ) - shl_angle_d;
 
     /* Servo pulses */
-    float bas_servopulse = 1500.0 - (( degrees( bas_angle_r )) * 9.804 );
-    float shl_servopulse = 1485.0 + (( shl_angle_d - 90.0 ) * 9.524 );
-    float elb_servopulse = 1660.0 +  (( elb_angle_d - 90.0 ) * 9.174 );
-    float wri_servopulse = 1500.0 - ( wri_angle_d  * 10.0 );
+    float bas_servopulse = BASE_SERVO_HOME_US
+        - (( degrees( bas_angle_r )) * (1.0 / BASE_SERVO_DEGREE_PER_US) );
+    float shl_servopulse = SHOULDER_SERVO_HOME_US
+        + (( shl_angle_d - 90.0 ) * (1.0 / SHOULDER_SERVO_DEGREE_PER_US) );
+    float elb_servopulse = ELBOW_SERVO_HOME_US
+        +  (( elb_angle_d - 90.0 ) * (1.0 / ELBOW_SERVO_DEGREE_PER_US) );
+    float wri_servopulse = WRIST_SERVO_HOME_US
+        - ( wri_angle_d  * (1.0 / WRIST_SERVO_DEGREE_PER_US) );
 
 #ifdef DEBUG
     Serial.print("Wrote to base:  ");
