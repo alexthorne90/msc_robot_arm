@@ -56,7 +56,7 @@ void setup()
     Base.attach(Base_pin);
     Shldr.attach(Shoulder_pin);
     Elb.attach(Elbow_pin);
-    Wrist.attach(Wrist_pin);
+    Wrist.attach(Wrist_pin, 553, 2520);
     Gripper.attach(Gripper_pin);
 
 }
@@ -145,17 +145,65 @@ void loop()
         Serial.print("Servo input = ");
         Serial.println(servoSetting);
 
-        Serial.println("Type 'g' to go or 'q' to cancel");
+        Serial.println("Type 'b' 's' 'e' or 'w' to go for that servo or 'q' to cancel");
         while (1)
         {
             incomingByte = Serial.read();
-            if (incomingByte == 'g')
+            if (incomingByte == 'b')
             {
-                if (servoSetting > 900 && servoSetting < 2100)
+                if (servoSetting > 556 && servoSetting < 2520)
                 {
                     Serial.print("Wrote ");
                     Serial.print(servoSetting);
-                    Serial.println(" to the servo");
+                    Serial.println(" to the servo base");
+                    //Update the servo desired here
+                    Base.writeMicroseconds(servoSetting);
+                }
+                else
+                {
+                    Serial.println("Invalid servo setting");
+                }
+                break;
+            }
+            else if (incomingByte == 's')
+            {
+                if (servoSetting > 556 && servoSetting < 2520)
+                {
+                    Serial.print("Wrote ");
+                    Serial.print(servoSetting);
+                    Serial.println(" to the servo shldr");
+                    //Update the servo desired here
+                    Shldr.writeMicroseconds(servoSetting);
+                }
+                else
+                {
+                    Serial.println("Invalid servo setting");
+                }
+                break;
+            }
+            else if (incomingByte == 'e')
+            {
+                if (servoSetting > 556 && servoSetting < 2520)
+                {
+                    Serial.print("Wrote ");
+                    Serial.print(servoSetting);
+                    Serial.println(" to the servo elbow");
+                    //Update the servo desired here
+                    Elb.writeMicroseconds(servoSetting);
+                }
+                else
+                {
+                    Serial.println("Invalid servo setting");
+                }
+                break;
+            }
+            else if (incomingByte == 'w')
+            {
+                if (servoSetting > 556 && servoSetting < 2520)
+                {
+                    Serial.print("Wrote ");
+                    Serial.print(servoSetting);
+                    Serial.println(" to the servo wrist");
                     //Update the servo desired here
                     Wrist.writeMicroseconds(servoSetting);
                 }
