@@ -35,8 +35,8 @@ Servo Gripper;
 //Servo motor "home" positions
 #define BASE_SERVO_HOME_US      1510.0
 #define SHOULDER_SERVO_HOME_US  1485.0
-#define ELBOW_SERVO_HOME_US     1664.0
-#define WRIST_SERVO_HOME_US     1500.0
+#define ELBOW_SERVO_HOME_US     1685.0
+#define WRIST_SERVO_HOME_US     1520.0
 
 //Servo angle scale factors
 #define BASE_SERVO_DEGREE_PER_US        0.1011
