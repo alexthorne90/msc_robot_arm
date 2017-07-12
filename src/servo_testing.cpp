@@ -209,7 +209,7 @@ void loop()
         if (command == 'g')
         {
             Serial.println("IK go!");
-            set_arm(x_coordinate, y_coordinate, z_coordinate, -90);
+            set_arm(x_coordinate, y_coordinate, z_coordinate, 0);
             break;
         }
         else if (command == 'q')
@@ -228,6 +228,15 @@ void loop()
             gripper_pos -= 25;
             Gripper.writeMicroseconds(gripper_pos);
             command = 0;
+        }
+        else if (command == 'l')
+        {
+            for (x_coordinate = x_coordinate; x_coordinate < 120; x_coordinate += 5)
+            {
+                set_arm(x_coordinate, y_coordinate, z_coordinate, 0);
+                delay(200);
+            }
+            break;
         }
     }
     delay(2000);
