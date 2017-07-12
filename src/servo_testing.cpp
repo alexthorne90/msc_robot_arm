@@ -14,7 +14,7 @@
 
 
 //Arm dimensions (mm)
-#define BASE_HGT 69.5       //base hight 2.736"
+#define BASE_HGT 70.0       //base hight 2.736"
 #define HUMERUS 146.0       //shoulder-to-elbow "bone" 5.748"
 #define ULNA 185.0          //elbow-to-wrist "bone" 7.283"
 #define GRIPPER 86.5        //gripper length to tip 3.406"
@@ -39,10 +39,10 @@ Servo Gripper;
 #define WRIST_SERVO_HOME_US     1520.0
 
 //Servo angle scale factors
-#define BASE_SERVO_DEGREE_PER_US        0.1011
+#define BASE_SERVO_DEGREE_PER_US        0.102
 #define SHOULDER_SERVO_DEGREE_PER_US    0.105
-#define ELBOW_SERVO_DEGREE_PER_US       0.0987
-#define WRIST_SERVO_DEGREE_PER_US       0.0947
+#define ELBOW_SERVO_DEGREE_PER_US       0.109
+#define WRIST_SERVO_DEGREE_PER_US       0.100
 
 
 void setup()
@@ -56,9 +56,13 @@ void setup()
     Gripper.attach(Gripper_pin);
 
     Base.writeMicroseconds(BASE_SERVO_HOME_US);
+    delay(15);
     Shldr.writeMicroseconds(SHOULDER_SERVO_HOME_US);
+    delay(15);
     Elb.writeMicroseconds(ELBOW_SERVO_HOME_US);
+    delay(15);
     Wrist.writeMicroseconds(WRIST_SERVO_HOME_US);
+    delay(15);
 
 }
 
@@ -134,9 +138,13 @@ void set_arm( float x, float y, float z, float grip_angle_d )
 #endif
 
     Base.writeMicroseconds(bas_servopulse);
+    delay(15);
     Shldr.writeMicroseconds(shl_servopulse);
+    delay(15);
     Elb.writeMicroseconds(elb_servopulse);
+    delay(15);
     Wrist.writeMicroseconds(wri_servopulse);
+    delay(15);
 
 }
 
