@@ -13,7 +13,7 @@ Ldc1614::Ldc1614()
 	//initialize variables
 }
 
-void Ldc1614::AttachComms()
+void Ldc1614::AttachComms(void)
 {
     Wire.begin();
 }
