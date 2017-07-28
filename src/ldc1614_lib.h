@@ -20,6 +20,7 @@ class Ldc1614 {
         void AttachComms(void);
         uint8_t WriteReg(uint8_t reg, uint16_t value);
         uint16_t ReadReg(uint8_t reg);
+        bool TestConnection(void);
 
         //LDC1614 register addresses
         //  Data
@@ -67,8 +68,8 @@ class Ldc1614 {
         const uint8_t DRIVE_CURRENT_CH2 = 0x20;
         const uint8_t DRIVE_CURRENT_CH3 = 0x21;
         //  Sensor current drive configuration
-        const uint8_t MANUFACT_ID_REG   = 0x22;
-        const uint8_t DEVICE_ID_REG     = 0x23;
+        const uint8_t MANUFACT_ID_REG   = 0x7E;
+        const uint8_t DEVICE_ID_REG     = 0x7F;
 
     private:
 
@@ -77,7 +78,7 @@ class Ldc1614 {
 
         //LDC1614 IDs
         const uint16_t LDC1614_MANUFACT_ID  = 0x5449;
-        const uint16_t LDC1614_DEVICE_ID    = 0x3005;
+        const uint16_t LDC1614_DEVICE_ID    = 0x3055;
 
 };
 

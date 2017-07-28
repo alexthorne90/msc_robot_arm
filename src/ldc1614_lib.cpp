@@ -51,3 +51,8 @@ uint16_t Ldc1614::ReadReg(uint8_t reg)
     value += lsb;
     return value;
 }
+
+bool Ldc1614::TestConnection(void)
+{
+    return ReadReg(DEVICE_ID_REG) == LDC1614_DEVICE_ID;
+}
