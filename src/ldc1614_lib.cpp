@@ -6,7 +6,7 @@
 
 #include "ldc1614_lib.h"
 
-#define LDC1614_DEBUG
+//#define LDC1614_DEBUG
 
 Ldc1614::Ldc1614()
 {
@@ -29,6 +29,14 @@ uint8_t Ldc1614::WriteReg(uint8_t reg, uint16_t value)
     Wire.write(msb);
     Wire.write(lsb);
     Wire.endTransmission();
+
+#ifdef LDC1614_DEBUG
+    Serial.print("Wrote ");
+    Serial.print(reg);
+    Serial.print("to reg ");
+    Serial.println(value);
+#endif
+
     return 0;
 }
 
@@ -49,6 +57,14 @@ uint16_t Ldc1614::ReadReg(uint8_t reg)
     value = msb;
     value <<= 8;
     value += lsb;
+
+#ifdef LDC1614_DEBUG
+    Serial.print("Read reg ");
+    Serial.print(reg);
+    Serial.print("    and got: ");
+    Serial.println(value);
+#endif
+
     return value;
 }
 
