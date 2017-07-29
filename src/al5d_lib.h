@@ -27,6 +27,14 @@ class Al5d {
         float GetCurrentElbowAngle();
         float GetCurrentWristAngle();
 
+    protected:
+
+        //Arm dimensions (mm)
+        const float BASE_HGT    = 70.0;     //base hight 2.736"
+        const float HUMERUS     = 146.0;    //shoulder-to-elbow "bone" 5.748"
+        const float ULNA        = 185.0;    //elbow-to-wrist "bone" 7.283"
+        const float GRIPPER     = 86.5;     //gripper length to tip 3.406"
+
     private:
 
         float current_x;
@@ -48,12 +56,6 @@ class Al5d {
         const uint8_t ELBOW_PIN     = 10;
         const uint8_t WRIST_PIN     = 13;
         const uint8_t GRIPPER_PIN   = 12;
-
-        //Arm dimensions (mm)
-        const float BASE_HGT    = 70.0;     //base hight 2.736"
-        const float HUMERUS     = 146.0;    //shoulder-to-elbow "bone" 5.748"
-        const float ULNA        = 185.0;    //elbow-to-wrist "bone" 7.283"
-        const float GRIPPER     = 86.5;     //gripper length to tip 3.406"
 
         //Servo motor "home" positions
         const float BASE_SERVO_HOME_US      = 1510.0;
