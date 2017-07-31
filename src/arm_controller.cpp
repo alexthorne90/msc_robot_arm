@@ -6,7 +6,7 @@
 
 #include "arm_controller.h"
 
-#define ARM_CONTROLLER_DEBUG
+//#define ARM_CONTROLLER_DEBUG
 
 ArmController::ArmController(void) : Al5d()
 {
@@ -46,8 +46,8 @@ float ArmController::CalculateShoulderAngle(float x, float y, float z, float gri
     float wrist_y = rdist - grip_off_y;
 
 #ifdef ARM_CONTROLLER_DEBUG
-    Serial.println("Original calculations:");
-    Serial.print("Calculated wrist height = ");
+    Serial.println("Arm controller original calculations:");
+    Serial.print("wrist height = ");
     Serial.print(wrist_z);
     Serial.print("   and wrist depth = ");
     Serial.println(wrist_y);
@@ -61,30 +61,24 @@ float ArmController::CalculateShoulderAngle(float x, float y, float z, float gri
     //s_w angle to humerus
     float a2 = acos((( hum_sq - uln_sq ) + s_w ) / ( 2 * HUMERUS * s_w_sqrt ));
 
-#ifdef ARM_CONTROLLER_DEBUG
-    Serial.print("Calculated A1 = ");
-    Serial.print(degrees(a1));
-    Serial.print("    A2 = ");
-    Serial.println(degrees(a2));
-#endif
-
     //shoulder angle
     float shl_angle_r = a1 + a2;
     float shl_angle_d = degrees( shl_angle_r );
+
+#ifdef ARM_CONTROLLER_DEBUG
+    Serial.print("Calculated shoulder angle = ");
+    Serial.println(shl_angle_d - 90);
+#endif
+
     return (shl_angle_d - 90);
 }
 
 float ArmController::CalculateHeightErrorFromShoulderAngleAndHeight(float shoulder_angle, float height)
 {
-    float correction_70mm =  -0.000001 * pow(shoulder_angle, 4) + 0.0001 *
-        pow(shoulder_angle, 3) - 0.0043 * pow(shoulder_angle, 2) + 0.0177 *
-        shoulder_angle + 5.9731;
-    float correction_15mm = -0.000004 * pow(shoulder_angle, 4) + 0.00005 *
-        pow(shoulder_angle, 3) - 0.002 * pow(shoulder_angle, 2) - 0.0025 *
-        shoulder_angle + 11.223;
-    //float desired_correction = map(height, 15.0, 70.0, correction_15mm, correction_70mm);
-    float desired_correction = (height - 15.0) * (correction_70mm - correction_15mm) /
-        (70.0 - 15.0) + correction_15mm;
+    float correction_70mm = Calc70mmCorrection(shoulder_angle);
+    float correction_15mm = Calc15mmCorrection(shoulder_angle);
+    float desired_correction = MapFloat(height, 15.0, 70.0,
+            correction_15mm, correction_70mm);
 
 #ifdef ARM_CONTROLLER_DEBUG
     Serial.print("Correction at 70mm height:  ");
@@ -98,4 +92,28 @@ float ArmController::CalculateHeightErrorFromShoulderAngleAndHeight(float should
 #endif
 
     return desired_correction;
+}
+
+float ArmController::Calc70mmCorrection(float shoulder_angle)
+{
+    return EC_70mm_POW4_COEFF * pow(shoulder_angle, 4) +
+        EC_70mm_POW3_COEFF * pow(shoulder_angle, 3) +
+        EC_70mm_POW2_COEFF * pow(shoulder_angle, 2) +
+        EC_70mm_POW1_COEFF * shoulder_angle +
+        EC_70mm_POW0_COEFF;
+}
+
+float ArmController::Calc15mmCorrection(float shoulder_angle)
+{
+    return EC_15mm_POW4_COEFF * pow(shoulder_angle, 4) +
+        EC_15mm_POW3_COEFF * pow(shoulder_angle, 3) +
+        EC_15mm_POW2_COEFF * pow(shoulder_angle, 2) +
+        EC_15mm_POW1_COEFF * shoulder_angle +
+        EC_15mm_POW0_COEFF;
+}
+
+float ArmController::MapFloat(float x, float in_min, float in_max,
+        float out_min, float out_max)
+{
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }

@@ -20,8 +20,25 @@ class ArmController : public Al5d
 
     private:
 
+        //Private helper functions
         float CalculateShoulderAngle(float x, float y, float z, float grip_angle_d);
         float CalculateHeightErrorFromShoulderAngleAndHeight(float shoulder_angle, float height);
+        float Calc70mmCorrection(float shoulder_angle);
+        float Calc15mmCorrection(float shoulder_angle);
+        float MapFloat(float x, float in_min, float in_max,
+                float out_min, float out_max);
+
+        //Error correction polynomial constants
+        const float EC_70mm_POW4_COEFF = -0.000001;
+        const float EC_70mm_POW3_COEFF = 0.0001;
+        const float EC_70mm_POW2_COEFF = -0.0043;
+        const float EC_70mm_POW1_COEFF = 0.0177;
+        const float EC_70mm_POW0_COEFF = 5.9731;
+        const float EC_15mm_POW4_COEFF = -0.000004;
+        const float EC_15mm_POW3_COEFF = 0.00005;
+        const float EC_15mm_POW2_COEFF = -0.002;
+        const float EC_15mm_POW1_COEFF = -0.0025;
+        const float EC_15mm_POW0_COEFF = 11.223;
 
 };
 
