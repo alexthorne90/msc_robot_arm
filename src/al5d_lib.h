@@ -63,11 +63,35 @@ class Al5d {
         const float ELBOW_SERVO_HOME_US     = 1685.0;
         const float WRIST_SERVO_HOME_US     = 1520.0;
 
+        //Arm positions at servo home positions
+        const float ARM_HOME_X                  = 0.0;
+        const float ARM_HOME_Y                  = ULNA + GRIPPER;
+        const float ARM_HOME_Z                  = BASE_HGT + HUMERUS;
+        const float ARM_HOME_BASE_ANGLE         = 0.0;
+        const float ARM_HOME_SHOULDER_ANGLE     = 90.0;
+        const float ARM_HOME_ELBOW_ANGLE        = 90.0;
+        const float ARM_HOME_WRIST_ANGLE        = 90.0;
+
         //Servo angle scale factors
         const float BASE_SERVO_DEGREE_PER_US        = 0.102;
         const float SHOULDER_SERVO_DEGREE_PER_US    = 0.105;
         const float ELBOW_SERVO_DEGREE_PER_US       = 0.109;
         const float WRIST_SERVO_DEGREE_PER_US       = 0.100;
+
+        //Servo min and max microsecond positions
+        const uint16_t BASE_SERVO_MIN_POS       = 554;
+        const uint16_t BASE_SERVO_MAX_POS       = 2425;
+        const uint16_t SHOULDER_SERVO_MIN_POS   = 556;
+        const uint16_t SHOULDER_SERVO_MAX_POS   = 2420;
+        const uint16_t ELBOW_SERVO_MIN_POS      = 556;
+        const uint16_t ELBOW_SERVO_MAX_POS      = 2410;
+        const uint16_t WRIST_SERVO_MIN_POS      = 553;
+        const uint16_t WRIST_SERVO_MAX_POS      = 2520;
+        const uint16_t GRIPPER_SERVO_MIN_POS    = 1000;
+        const uint16_t GRIPPER_SERVO_MAX_POS    = 2000;
+
+        //Servo update delay
+        const uint8_t SERVO_UPDATE_DELAY_MS     = 15;
 };
 
 #endif

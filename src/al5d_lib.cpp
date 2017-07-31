@@ -6,7 +6,7 @@
 
 #include "al5d_lib.h"
 
-#define DEBUG
+//#define  AL5D_DEBUG
 
 Al5d::Al5d()
 {
@@ -23,31 +23,33 @@ Al5d::Al5d()
 void Al5d::AttachMotors()
 {
     //attach motors
-    base_servo.attach(BASE_PIN, 554, 2425);
-    shoulder_servo.attach(SHOULDER_PIN, 556, 2420);
-    elbow_servo.attach(ELBOW_PIN, 556, 2410);
-    wrist_servo.attach(WRIST_PIN, 553, 2520);
-    gripper_servo.attach(GRIPPER_PIN);
+    base_servo.attach(BASE_PIN, BASE_SERVO_MIN_POS, BASE_SERVO_MAX_POS);
+    shoulder_servo.attach(SHOULDER_PIN, SHOULDER_SERVO_MIN_POS,
+            SHOULDER_SERVO_MAX_POS);
+    elbow_servo.attach(ELBOW_PIN, ELBOW_SERVO_MIN_POS, ELBOW_SERVO_MAX_POS);
+    wrist_servo.attach(WRIST_PIN, WRIST_SERVO_MIN_POS, WRIST_SERVO_MAX_POS);
+    gripper_servo.attach(GRIPPER_PIN, GRIPPER_SERVO_MIN_POS,
+            GRIPPER_SERVO_MAX_POS);
 }
 
 void Al5d::SetHomePosition()
 {
     base_servo.writeMicroseconds(BASE_SERVO_HOME_US);
-    delay(15);
+    delay(SERVO_UPDATE_DELAY_MS);
     shoulder_servo.writeMicroseconds(SHOULDER_SERVO_HOME_US);
-    delay(15);
+    delay(SERVO_UPDATE_DELAY_MS);
     elbow_servo.writeMicroseconds(ELBOW_SERVO_HOME_US);
-    delay(15);
+    delay(SERVO_UPDATE_DELAY_MS);
     wrist_servo.writeMicroseconds(WRIST_SERVO_HOME_US);
-    delay(15);
+    delay(SERVO_UPDATE_DELAY_MS);
 
-    current_x = 0;
-    current_y = ULNA + GRIPPER;
-    current_z = BASE_HGT + HUMERUS;
-    current_base_angle = 0;
-    current_shoulder_angle = 90;
-    current_elbow_angle = 90;
-    current_wrist_angle = 90;
+    current_x = ARM_HOME_X;
+    current_y = ARM_HOME_Y;
+    current_z = ARM_HOME_Z;
+    current_base_angle = ARM_HOME_BASE_ANGLE;
+    current_shoulder_angle = ARM_HOME_SHOULDER_ANGLE;
+    current_elbow_angle = ARM_HOME_ELBOW_ANGLE;
+    current_wrist_angle = ARM_HOME_WRIST_ANGLE;
 }
 
 uint8_t Al5d::SetArm(float x, float y, float z, float grip_angle_d)
@@ -67,8 +69,8 @@ uint8_t Al5d::SetArm(float x, float y, float z, float grip_angle_d)
     float wrist_z = ( z - grip_off_z ) - BASE_HGT;
     float wrist_y = rdist - grip_off_y;
 
-#ifdef DEBUG
-    Serial.print("Calculated wrist height = ");
+#ifdef  AL5D_DEBUG
+    Serial.print("Al5d calculated wrist height = ");
     Serial.print(wrist_z);
     Serial.print("   and wrist depth = ");
     Serial.println(wrist_y);
@@ -82,7 +84,7 @@ uint8_t Al5d::SetArm(float x, float y, float z, float grip_angle_d)
     //s_w angle to humerus
     float a2 = acos((( hum_sq - uln_sq ) + s_w ) / ( 2 * HUMERUS * s_w_sqrt ));
 
-#ifdef DEBUG
+#ifdef  AL5D_DEBUG
     Serial.print("Calculated A1 = ");
     Serial.print(degrees(a1));
     Serial.print("    A2 = ");
@@ -109,25 +111,25 @@ uint8_t Al5d::SetArm(float x, float y, float z, float grip_angle_d)
     float wri_servopulse = WRIST_SERVO_HOME_US
         - ( wri_angle_d  * (1.0 / WRIST_SERVO_DEGREE_PER_US) );
 
-#ifdef DEBUG
-    Serial.print("Wrote to base:  ");
+#ifdef  AL5D_DEBUG
+    Serial.print("Write to base:  ");
     Serial.println(bas_servopulse);
-    Serial.print("Wrote to shoulder:  ");
+    Serial.print("Write to shoulder:  ");
     Serial.println(shl_servopulse);
-    Serial.print("Wrote to elbow:  ");
+    Serial.print("Write to elbow:  ");
     Serial.println(elb_servopulse);
-    Serial.print("Wrote to wrist:  ");
+    Serial.print("Write to wrist:  ");
     Serial.println(wri_servopulse);
 #endif
 
     base_servo.writeMicroseconds(bas_servopulse);
-    delay(15);
+    delay(SERVO_UPDATE_DELAY_MS);
     shoulder_servo.writeMicroseconds(shl_servopulse);
-    delay(15);
+    delay(SERVO_UPDATE_DELAY_MS);
     elbow_servo.writeMicroseconds(elb_servopulse);
-    delay(15);
+    delay(SERVO_UPDATE_DELAY_MS);
     wrist_servo.writeMicroseconds(wri_servopulse);
-    delay(15);
+    delay(SERVO_UPDATE_DELAY_MS);
 
     current_x = x;
     current_y = y;
