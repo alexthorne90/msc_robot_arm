@@ -19,6 +19,7 @@ uint8_t ArmController::SetArm(float x, float y, float z, float grip_angle_d)
     float updated_z = z -
         CalculateHeightErrorFromShoulderAngleAndHeight(
                 original_shoulder_angle, z);
+
 #ifdef ARM_CONTROLLER_DEBUG
     Serial.print("Updated height to ");
     Serial.print(updated_z);
