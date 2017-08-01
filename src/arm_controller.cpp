@@ -34,23 +34,26 @@ uint8_t ArmController::Update(uint16_t time_since_last_update_ms)
     float next_x = desired_x;
     float next_y = desired_y;
     float next_z = desired_z;
+    float delta_x = abs(next_x - current_x);
+    float delta_y = abs(next_y - current_y);
+    float delta_z = abs(next_z - current_z);
+    float largest_delta = 0;
+    float delta_factor = 0;
     float max_move_this_update = (MAX_MM_PER_SECOND_UPDATE /
-        (float)(1000.0 / time_since_last_update_ms));
+            (float)(1000.0 / time_since_last_update_ms));
 
-    if (abs(next_x - current_x) > max_move_this_update)
+    if (delta_x > max_move_this_update || delta_y > max_move_this_update ||
+            delta_z > max_move_this_update)
     {
-        next_x = (next_x > current_x) ? current_x + max_move_this_update :
-            current_x - max_move_this_update;
-    }
-    if (abs(next_y - current_y) > max_move_this_update)
-    {
-        next_y = (next_y > current_y) ? current_y + max_move_this_update :
-            current_y - max_move_this_update;
-    }
-    if (abs(next_z - current_z) > max_move_this_update)
-    {
-        next_z = (next_z > current_z) ? current_z + max_move_this_update :
-            current_z - max_move_this_update;
+        largest_delta = max(delta_x, delta_y);
+        largest_delta = max(largest_delta, delta_z);
+        delta_factor = largest_delta / max_move_this_update;
+        next_x = (next_x > current_x) ? current_x + (delta_x / delta_factor) :
+            current_x - (delta_x / delta_factor);
+        next_y = (next_y > current_y) ? current_y + (delta_y / delta_factor) :
+            current_y - (delta_y / delta_factor);
+        next_z = (next_z > current_z) ? current_z + (delta_z / delta_factor) :
+            current_z - (delta_z / delta_factor);
     }
 
     float original_shoulder_angle =
@@ -60,11 +63,18 @@ uint8_t ArmController::Update(uint16_t time_since_last_update_ms)
                 original_shoulder_angle, next_z);
 
 #ifdef ARM_CONTROLLER_DEBUG
+    Serial.print("Set arm to x = ");
+    Serial.print(next_x);
+    Serial.print(" y = ");
+    Serial.print(next_y);
+    Serial.print(" z = ");
+    Serial.println(next_z);
     Serial.print("Updated height to ");
     Serial.print(error_corrected_z);
     Serial.print(" based on original shoulder angle of ");
     Serial.println(original_shoulder_angle);
 #endif
+
 
     current_x = next_x;
     current_y = next_y;
