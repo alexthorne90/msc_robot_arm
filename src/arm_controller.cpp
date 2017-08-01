@@ -18,6 +18,9 @@ void ArmController::SetHomePosition(void)
     current_x = GetCurrentX();
     current_y = GetCurrentY();
     current_z = GetCurrentZ();
+    desired_x = current_x;
+    desired_y = current_y;
+    desired_z = current_z;
 }
 
 uint8_t ArmController::SetArm(float x, float y, float z, float grip_angle_d)
@@ -80,6 +83,13 @@ uint8_t ArmController::Update(uint16_t time_since_last_update_ms)
     current_y = next_y;
     current_z = next_z;
     return Al5d::SetArm(next_x, next_y, error_corrected_z, desired_grip_angle);
+}
+
+bool ArmController::hasReachedDesiredPosition()
+{
+    return (current_x == desired_x) &&
+        (current_y == desired_y) &&
+        (current_z == desired_z);
 }
 
 float ArmController::CalculateShoulderAngle(float x, float y, float z, float grip_angle_d)

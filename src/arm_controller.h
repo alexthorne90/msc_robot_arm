@@ -19,6 +19,7 @@ class ArmController : public Al5d
         void SetHomePosition(void);
         uint8_t SetArm(float x, float y, float z, float grip_angle_d);
         uint8_t Update(uint16_t time_since_last_update_ms);
+        bool hasReachedDesiredPosition();
 
     private:
 
