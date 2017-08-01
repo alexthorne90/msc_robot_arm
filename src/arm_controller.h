@@ -27,11 +27,13 @@ class ArmController : public Al5d
         float current_x;
         float current_y;
         float current_z;
+        float current_grip_angle;
         float desired_x;
         float desired_y;
         float desired_z;
         float desired_grip_angle;
         float MAX_MM_PER_SECOND_UPDATE = 25.0;
+        float MAX_ANGLE_PER_SECOND_GRIPPER_UPDATE = 20.0;
 
         //Private helper functions
         float CalculateShoulderAngle(float x, float y, float z, float grip_angle_d);

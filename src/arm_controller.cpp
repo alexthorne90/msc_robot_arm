@@ -18,9 +18,11 @@ void ArmController::SetHomePosition(void)
     current_x = GetCurrentX();
     current_y = GetCurrentY();
     current_z = GetCurrentZ();
+    current_grip_angle = GetCurrentWristAngle();
     desired_x = current_x;
     desired_y = current_y;
     desired_z = current_z;
+    desired_grip_angle = current_grip_angle;
 }
 
 uint8_t ArmController::SetArm(float x, float y, float z, float grip_angle_d)
@@ -37,12 +39,16 @@ uint8_t ArmController::Update(uint16_t time_since_last_update_ms)
     float next_x = desired_x;
     float next_y = desired_y;
     float next_z = desired_z;
+    float next_grip_angle = desired_grip_angle;
     float delta_x = abs(next_x - current_x);
     float delta_y = abs(next_y - current_y);
     float delta_z = abs(next_z - current_z);
+    float delta_grip_angle = abs(next_grip_angle - current_grip_angle);
     float largest_delta = 0;
     float delta_factor = 0;
     float max_move_this_update = (MAX_MM_PER_SECOND_UPDATE /
+            (float)(1000.0 / time_since_last_update_ms));
+    float max_grip_change_this_update = (MAX_ANGLE_PER_SECOND_GRIPPER_UPDATE /
             (float)(1000.0 / time_since_last_update_ms));
 
     if (delta_x > max_move_this_update || delta_y > max_move_this_update ||
@@ -59,8 +65,15 @@ uint8_t ArmController::Update(uint16_t time_since_last_update_ms)
             current_z - (delta_z / delta_factor);
     }
 
+    if (delta_grip_angle > max_grip_change_this_update)
+    {
+        next_grip_angle = (next_grip_angle > current_grip_angle) ?
+            current_grip_angle + max_grip_change_this_update :
+            current_grip_angle - max_grip_change_this_update;
+    }
+
     float original_shoulder_angle =
-        CalculateShoulderAngle(next_x, next_y, next_z, desired_grip_angle);
+        CalculateShoulderAngle(next_x, next_y, next_z, next_grip_angle);
     float error_corrected_z = next_z -
         CalculateHeightErrorFromShoulderAngleAndHeight(
                 original_shoulder_angle, next_z);
@@ -71,7 +84,9 @@ uint8_t ArmController::Update(uint16_t time_since_last_update_ms)
     Serial.print(" y = ");
     Serial.print(next_y);
     Serial.print(" z = ");
-    Serial.println(next_z);
+    Serial.print(next_z);
+    Serial.print("wrist angle = ");
+    Serial.println(next_grip_angle);
     Serial.print("Updated height to ");
     Serial.print(error_corrected_z);
     Serial.print(" based on original shoulder angle of ");
@@ -82,7 +97,8 @@ uint8_t ArmController::Update(uint16_t time_since_last_update_ms)
     current_x = next_x;
     current_y = next_y;
     current_z = next_z;
-    return Al5d::SetArm(next_x, next_y, error_corrected_z, desired_grip_angle);
+    current_grip_angle = next_grip_angle;
+    return Al5d::SetArm(next_x, next_y, error_corrected_z, next_grip_angle);
 }
 
 bool ArmController::hasReachedDesiredPosition()
