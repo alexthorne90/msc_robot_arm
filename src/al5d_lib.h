@@ -70,7 +70,7 @@ class Al5d {
         const float ARM_HOME_BASE_ANGLE         = 0.0;
         const float ARM_HOME_SHOULDER_ANGLE     = 90.0;
         const float ARM_HOME_ELBOW_ANGLE        = 90.0;
-        const float ARM_HOME_WRIST_ANGLE        = 90.0;
+        const float ARM_HOME_WRIST_ANGLE        = 0.0;
 
         //Servo angle scale factors
         const float BASE_SERVO_DEGREE_PER_US        = 0.102;
