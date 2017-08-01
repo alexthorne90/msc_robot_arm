@@ -12,22 +12,64 @@ ArmController::ArmController(void) : Al5d()
 {
 }
 
+void ArmController::SetHomePosition(void)
+{
+    Al5d::SetHomePosition();
+    current_x = GetCurrentX();
+    current_y = GetCurrentY();
+    current_z = GetCurrentZ();
+}
+
 uint8_t ArmController::SetArm(float x, float y, float z, float grip_angle_d)
 {
+    desired_x = x;
+    desired_y = y;
+    desired_z = z;
+    desired_grip_angle = grip_angle_d;
+    return 0;
+}
+
+uint8_t ArmController::Update(uint16_t time_since_last_update_ms)
+{
+    float next_x = desired_x;
+    float next_y = desired_y;
+    float next_z = desired_z;
+    float max_move_this_update = (MAX_MM_PER_SECOND_UPDATE /
+        (float)(1000.0 / time_since_last_update_ms));
+
+    if (abs(next_x - current_x) > max_move_this_update)
+    {
+        next_x = (next_x > current_x) ? current_x + max_move_this_update :
+            current_x - max_move_this_update;
+    }
+    if (abs(next_y - current_y) > max_move_this_update)
+    {
+        next_y = (next_y > current_y) ? current_y + max_move_this_update :
+            current_y - max_move_this_update;
+    }
+    if (abs(next_z - current_z) > max_move_this_update)
+    {
+        next_z = (next_z > current_z) ? current_z + max_move_this_update :
+            current_z - max_move_this_update;
+    }
+
     float original_shoulder_angle =
-        CalculateShoulderAngle(x, y, z, grip_angle_d);
-    float updated_z = z -
+        CalculateShoulderAngle(next_x, next_y, next_z, desired_grip_angle);
+    float error_corrected_z = next_z -
         CalculateHeightErrorFromShoulderAngleAndHeight(
-                original_shoulder_angle, z);
+                original_shoulder_angle, next_z);
 
 #ifdef ARM_CONTROLLER_DEBUG
     Serial.print("Updated height to ");
-    Serial.print(updated_z);
+    Serial.print(error_corrected_z);
     Serial.print(" based on original shoulder angle of ");
     Serial.println(original_shoulder_angle);
 #endif
 
-    return Al5d::SetArm(x, y, updated_z, grip_angle_d);
+    current_x = next_x;
+    current_y = next_y;
+    current_z = next_z;
+    return Al5d::SetArm(next_x, next_y, error_corrected_z, desired_grip_angle);
 }
 
 float ArmController::CalculateShoulderAngle(float x, float y, float z, float grip_angle_d)

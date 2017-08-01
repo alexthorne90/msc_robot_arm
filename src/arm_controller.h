@@ -16,9 +16,21 @@ class ArmController : public Al5d
     public:
 
         ArmController(void);
+        void SetHomePosition(void);
         uint8_t SetArm(float x, float y, float z, float grip_angle_d);
+        uint8_t Update(uint16_t time_since_last_update_ms);
 
     private:
+
+        //Private vars
+        float current_x;
+        float current_y;
+        float current_z;
+        float desired_x;
+        float desired_y;
+        float desired_z;
+        float desired_grip_angle;
+        float MAX_MM_PER_SECOND_UPDATE = 25.0;
 
         //Private helper functions
         float CalculateShoulderAngle(float x, float y, float z, float grip_angle_d);
