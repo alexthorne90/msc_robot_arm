@@ -20,8 +20,14 @@ class ArmController : public Al5d
         uint8_t SetArm(float x, float y, float z, float grip_angle_d);
         uint8_t Update(uint16_t time_since_last_update_ms);
         bool hasReachedDesiredPosition();
+        void SetMMPerSecondArmSpeed(float new_speed);
 
     private:
+
+        //Speed constants
+        const float MM_PER_SECOND_SPEED_MIN = 1.0;
+        const float MM_PER_SECOND_SPEED_MAX = 90.0;
+        const float MM_PER_SECOND_SPEED_DEFAULT = 40.0;
 
         //Private vars
         float current_x;
@@ -32,7 +38,7 @@ class ArmController : public Al5d
         float desired_y;
         float desired_z;
         float desired_grip_angle;
-        float MAX_MM_PER_SECOND_UPDATE = 25.0;
+        float mm_per_second_update_speed = MM_PER_SECOND_SPEED_DEFAULT;
         float MAX_ANGLE_PER_SECOND_GRIPPER_UPDATE = 20.0;
 
         //Private helper functions

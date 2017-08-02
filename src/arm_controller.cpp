@@ -46,7 +46,7 @@ uint8_t ArmController::Update(uint16_t time_since_last_update_ms)
     float delta_grip_angle = abs(next_grip_angle - current_grip_angle);
     float largest_delta = 0;
     float delta_factor = 0;
-    float max_move_this_update = (MAX_MM_PER_SECOND_UPDATE /
+    float max_move_this_update = (mm_per_second_update_speed /
             (float)(1000.0 / time_since_last_update_ms));
     float max_grip_change_this_update = (MAX_ANGLE_PER_SECOND_GRIPPER_UPDATE /
             (float)(1000.0 / time_since_last_update_ms));
@@ -150,6 +150,19 @@ float ArmController::CalculateShoulderAngle(float x, float y, float z, float gri
 #endif
 
     return (shl_angle_d - 90);
+}
+
+void ArmController::SetMMPerSecondArmSpeed(float new_speed)
+{
+    mm_per_second_update_speed = new_speed;
+    if (mm_per_second_update_speed > MM_PER_SECOND_SPEED_MAX)
+    {
+        mm_per_second_update_speed = MM_PER_SECOND_SPEED_MAX;
+    }
+    if (mm_per_second_update_speed < MM_PER_SECOND_SPEED_MIN)
+    {
+        mm_per_second_update_speed = MM_PER_SECOND_SPEED_MIN;
+    }
 }
 
 float ArmController::CalculateHeightErrorFromShoulderAngleAndHeight(float shoulder_angle, float height)
