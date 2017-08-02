@@ -90,8 +90,8 @@ class Al5d {
         const uint16_t GRIPPER_SERVO_MIN_POS    = 1000;
         const uint16_t GRIPPER_SERVO_MAX_POS    = 2000;
 
-        //Servo update delay
-        const uint8_t SERVO_UPDATE_DELAY_MS     = 15;
+        //Servo home position update delay
+        const uint8_t SERVO_UPDATE_DELAY_MS     = 100;
 };
 
 #endif

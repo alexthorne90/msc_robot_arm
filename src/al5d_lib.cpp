@@ -123,13 +123,9 @@ uint8_t Al5d::SetArm(float x, float y, float z, float grip_angle_d)
 #endif
 
     base_servo.writeMicroseconds(bas_servopulse);
-    delay(SERVO_UPDATE_DELAY_MS);
     shoulder_servo.writeMicroseconds(shl_servopulse);
-    delay(SERVO_UPDATE_DELAY_MS);
     elbow_servo.writeMicroseconds(elb_servopulse);
-    delay(SERVO_UPDATE_DELAY_MS);
     wrist_servo.writeMicroseconds(wri_servopulse);
-    delay(SERVO_UPDATE_DELAY_MS);
 
     current_x = x;
     current_y = y;
