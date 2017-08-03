@@ -76,7 +76,7 @@ class Al5d {
         const float BASE_SERVO_DEGREE_PER_US        = 0.102;
         const float SHOULDER_SERVO_DEGREE_PER_US    = 0.105;
         const float ELBOW_SERVO_DEGREE_PER_US       = 0.109;
-        const float WRIST_SERVO_DEGREE_PER_US       = 0.100;
+        const float WRIST_SERVO_DEGREE_PER_US       = 0.095;
 
         //Servo min and max microsecond positions
         const uint16_t BASE_SERVO_MIN_POS       = 554;
