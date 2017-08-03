@@ -37,6 +37,7 @@ class Al5d {
 
     private:
 
+        //Private vars
         float current_x;
         float current_y;
         float current_z;
@@ -49,6 +50,9 @@ class Al5d {
         Servo shoulder_servo;
         Servo wrist_servo;
         Servo gripper_servo;
+        //Private helper functions
+        bool ServoPulseOutOfBounds(float base, float shoulder, float elbow,
+                float wrist);
 
         //Arm Servo pins
         const uint8_t BASE_PIN      = 4;

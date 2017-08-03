@@ -111,6 +111,12 @@ uint8_t Al5d::SetArm(float x, float y, float z, float grip_angle_d)
     float wri_servopulse = WRIST_SERVO_HOME_US
         - ( wri_angle_d  * (1.0 / WRIST_SERVO_DEGREE_PER_US) );
 
+    if (ServoPulseOutOfBounds(bas_servopulse, shl_servopulse, elb_servopulse,
+                wri_servopulse))
+    {
+        return 1;
+    }
+
 #ifdef  AL5D_DEBUG
     Serial.print("Write to base:  ");
     Serial.println(bas_servopulse);
@@ -171,4 +177,18 @@ float Al5d::GetCurrentElbowAngle()
 float Al5d::GetCurrentWristAngle()
 {
     return current_wrist_angle;
+}
+
+// Private helpers *************************************************************
+bool Al5d::ServoPulseOutOfBounds(float base, float shoulder, float elbow,
+        float wrist)
+{
+    return ((base > BASE_SERVO_MAX_POS) ||
+            (base < BASE_SERVO_MIN_POS) ||
+            (shoulder > SHOULDER_SERVO_MAX_POS) ||
+            (shoulder < SHOULDER_SERVO_MIN_POS) ||
+            (elbow > ELBOW_SERVO_MAX_POS) ||
+            (elbow < ELBOW_SERVO_MIN_POS) ||
+            (wrist > WRIST_SERVO_MAX_POS) ||
+            (wrist < WRIST_SERVO_MIN_POS));
 }
