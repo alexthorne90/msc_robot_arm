@@ -46,11 +46,14 @@ void setup()
     {
         delay(ARM_UPDATE_PERIOD_MS);
         arm.Update(ARM_UPDATE_PERIOD_MS);
+        metal_detector.Update();
     }
     Serial.println("Initial arm test position set");
     last_md_update_millis = millis();
     last_arm_update_millis = millis();
 	Serial.println("All initialized, begin test.");
+	Serial.print("Initial inductance reading = ");
+	Serial.println(metal_detector.GetCh0InductanceuH());
 }
 
 void loop()
