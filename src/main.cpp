@@ -5,22 +5,29 @@
 static MetalDetector metal_detector;
 static ArmController arm;
 
-static const int MD_UPDATE_PERIOD_MS = 150;
+static const int MD_UPDATE_PERIOD_MS = 50;
 static unsigned long last_md_update_millis = 0;
 
 static const int ARM_UPDATE_PERIOD_MS = 25;
 static unsigned long last_arm_update_millis = 0;
 
-static const int TEST_UPDATE_PERIOD_MS = 1000;
+static uint16_t test_counter = 0;
+static const uint16_t NUM_TESTS_DESIRED = 1000;
+static const int TEST_UPDATE_PERIOD_MS = 200;
 static unsigned long last_test_update_millis;
 static const float test_y = 150;
 static const float test_gripper_angle = -90;
-static const float test_z = 46.5;
+static float test_z = 46.5;
 static const float test_initial_reading_z = test_z + 40;
 static const float TEST_X_INCREMENT_MM = 0.5;
 static const float TEST_X_MAX_DELTA = 50.0;
+static const float TEST_Z_CORRECTION_INCREMENT_MM = 0.25;
 static float test_x = 0;
 static int8_t current_dir = -1;
+
+static float initial_inductance;
+static const float MIN_DESIRED_INDUCTANCE_DELTA = 0.2343;
+static const float MAX_DESIRED_INDUCTANCE_DELTA = 0.4785;
 
 bool isTimeForArmUpdate(void);
 bool isTimeForMDUpdate(void);
@@ -52,7 +59,8 @@ void setup()
     }
     Serial.println("Initial arm test position set");
 	Serial.print("Initial inductance reading = ");
-	Serial.println(metal_detector.GetCh0InductanceuH(), 6);
+    initial_inductance = metal_detector.GetCh0InductanceuH();
+	Serial.println(initial_inductance, 6);
     delay(1000);
     arm.SetArm(test_x, test_y, test_z, test_gripper_angle);
     arm.Update(ARM_UPDATE_PERIOD_MS);
@@ -65,7 +73,8 @@ void setup()
     last_md_update_millis = millis();
     last_arm_update_millis = millis();
     last_test_update_millis = millis();
-    Serial.println("Arm lowered to initial test position");
+    Serial.print("Arm lowered to initial test position, height = ");
+    Serial.println(test_z);
 	Serial.println("All initialized, begin test.");
 }
 
@@ -130,10 +139,28 @@ bool isTimeForTestUpdate(void)
 
 void TestUpdate(void)
 {
-    Serial.print("LDC inductance ");
-    Serial.print(metal_detector.GetCh0InductanceuH(), 6);
-    Serial.print("  at x =  ");
-    Serial.println(test_x);
+    float current_inductance = metal_detector.GetCh0InductanceuH();
+    Serial.print("Inductance ");
+    Serial.print(current_inductance, 6);
+    Serial.print("  x ");
+    Serial.print(test_x);
+    Serial.print("   z ");
+    Serial.println(test_z);
+    test_counter ++;
+    if (test_counter >= NUM_TESTS_DESIRED)
+    {
+        Serial.println("\nTest complete");
+        while (1);
+    }
+
+    if ((initial_inductance - current_inductance) > MAX_DESIRED_INDUCTANCE_DELTA)
+    {
+        test_z += TEST_Z_CORRECTION_INCREMENT_MM;
+    }
+    if ((initial_inductance - current_inductance) < MIN_DESIRED_INDUCTANCE_DELTA)
+    {
+        test_z -= TEST_Z_CORRECTION_INCREMENT_MM;
+    }
 
     if (current_dir == -1)
     {
