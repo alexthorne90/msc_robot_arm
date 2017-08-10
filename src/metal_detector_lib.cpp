@@ -23,12 +23,10 @@ void MetalDetector::ConnectToSensor(void)
 
 uint8_t MetalDetector::ConfigureSensor(void)
 {
-    WriteReg(RCOUNT_CH0, 0xFFFF);
-    WriteReg(SETTLECOUNT_CH0, 0x002D);
+    WriteReg(RCOUNT_CH0, 0x69DA);
+    WriteReg(SETTLECOUNT_CH0, 0x0031);
     WriteReg(CLK_DIVIDERS_CH0, 0x1002);
-    WriteReg(ERROR_CONFIG, 0x0000);
-    WriteReg(MUX_CONFIG_REG, 0x420C);
-    WriteReg(DRIVE_CURRENT_CH0, 0x0680);
+    WriteReg(MUX_CONFIG_REG, 0x020C);
     WriteReg(CONFIG_REG, 0x0001);
     return 0;
 }
