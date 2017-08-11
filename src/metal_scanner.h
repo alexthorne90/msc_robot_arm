@@ -21,6 +21,9 @@ class MetalScanner : public ArmController {
         //Public interface
         void HardwareSetup(void);
         void SetReferenceInductance(void);
+        uint8_t SetScanOrigin(float x, float y, float z);
+        uint8_t SetDesiredInductanceDelta(float inductance);
+        uint8_t SetInductanceDeltaTolerance(float tolerance);
         void Update(uint16_t time_since_last_update_ms);
 
     private:
@@ -28,6 +31,15 @@ class MetalScanner : public ArmController {
         //Private variables
         MetalDetector metal_detector;
         float reference_inductance;
+        float origin_x;
+        float origin_y;
+        float origin_z;
+        float desired_delta_uH;
+        float uH_tolerance;
+
+        //Default settings
+        const float DEFAULT_DELTA_uH = 0.25;
+        const float DEFAULT_uH_TOLERANCE = 0.1;
 
         //Private helper functions
 };
