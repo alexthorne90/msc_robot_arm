@@ -14,6 +14,9 @@ MetalScanner::MetalScanner(void) : ArmController()
     reference_inductance = 0;
     desired_delta_uH = DEFAULT_DELTA_uH;
     uH_tolerance = DEFAULT_uH_TOLERANCE;
+    horizontal_desired_travel_mm = DEFAULT_HORIZONTAL_DESIRED_TRAVEL_MM;
+    depth_desired_travel_mm = DEFAULT_DEPTH_DESIRED_TRAVEL_MM;
+    depth_scan_increment_mm = DEFAULT_DEPTH_SCAN_INCREMENT_MM;
 }
 
 void MetalScanner::HardwareSetup(void)
@@ -46,6 +49,24 @@ uint8_t MetalScanner::SetDesiredInductanceDelta(float inductance)
 uint8_t MetalScanner::SetInductanceDeltaTolerance(float tolerance)
 {
     uH_tolerance = tolerance;
+    return 0;
+}
+
+uint8_t MetalScanner::SetDesiredHorizontalTravelMM(float horizontal_travel)
+{
+    horizontal_desired_travel_mm = horizontal_travel;
+    return 0;
+}
+
+uint8_t MetalScanner::SetDesiredDepthTravelMM(float depth_travel)
+{
+    depth_desired_travel_mm = depth_travel;
+    return 0;
+}
+
+uint8_t MetalScanner::SetDepthScanIncrement(float depth_increment)
+{
+    depth_scan_increment_mm = depth_increment;
     return 0;
 }
 
