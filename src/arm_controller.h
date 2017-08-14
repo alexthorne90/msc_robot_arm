@@ -21,6 +21,9 @@ class ArmController : public Al5d
         uint8_t Update(uint16_t time_since_last_update_ms);
         bool hasReachedDesiredPosition();
         void SetMMPerSecondArmSpeed(float new_speed);
+        float GetCurrentX();
+        float GetCurrentY();
+        float GetCurrentZ();
 
     private:
 
