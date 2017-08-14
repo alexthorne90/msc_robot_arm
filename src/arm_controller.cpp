@@ -15,10 +15,10 @@ ArmController::ArmController(void) : Al5d()
 void ArmController::SetHomePosition(void)
 {
     Al5d::SetHomePosition();
-    current_x = GetCurrentX();
-    current_y = GetCurrentY();
-    current_z = GetCurrentZ();
-    current_grip_angle = GetCurrentWristAngle();
+    current_x = Al5d::GetCurrentX();
+    current_y = Al5d::GetCurrentY();
+    current_z = Al5d::GetCurrentZ();
+    current_grip_angle = Al5d::GetCurrentWristAngle();
     desired_x = current_x;
     desired_y = current_y;
     desired_z = current_z;
@@ -163,6 +163,21 @@ void ArmController::SetMMPerSecondArmSpeed(float new_speed)
     {
         mm_per_second_update_speed = MM_PER_SECOND_SPEED_MIN;
     }
+}
+
+float ArmController::GetCurrentX()
+{
+    return current_x;
+}
+
+float ArmController::GetCurrentY()
+{
+    return current_y;
+}
+
+float ArmController::GetCurrentZ()
+{
+    return current_z;
 }
 
 float ArmController::CalculateHeightErrorFromShoulderAngleAndHeight(float shoulder_angle, float height)
