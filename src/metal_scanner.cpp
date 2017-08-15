@@ -212,12 +212,6 @@ MetalScanner::scan_state MetalScanner::S2_Run(void)
 
 MetalScanner::scan_state MetalScanner::S3_Run(void)
 {
-    if (hasReachedDesiredPosition())
-    {
-        SetArm(current_x + 1.0, current_y, GetCorrectedHeight(
-                    current_z, inductance_delta), -90);
-    }
-
     if (current_x >= (horizontal_desired_travel_mm + origin_x))
     {
 #ifdef METAL_SCANNER_DEBUG
@@ -230,20 +224,18 @@ MetalScanner::scan_state MetalScanner::S3_Run(void)
 #endif
         return S4_DEPTH_MOVE;
     }
-    else
+
+    if (hasReachedDesiredPosition())
     {
-        return S3_HORIZONTAL_MOVE_FWD;
+        SetArm(current_x + 1.0, current_y, GetCorrectedHeight(
+                    current_z, inductance_delta), -90);
     }
+
+    return S3_HORIZONTAL_MOVE_FWD;
 }
 
 MetalScanner::scan_state MetalScanner::S4_Run(void)
 {
-    if (hasReachedDesiredPosition())
-    {
-        SetArm(current_x, current_y + 1.0, GetCorrectedHeight(
-                    current_z, inductance_delta), -90);
-    }
-
     if (current_y >= ((depth_scan_increment_mm * current_cycle_count) +
                 origin_y))
     {
@@ -257,20 +249,18 @@ MetalScanner::scan_state MetalScanner::S4_Run(void)
 #endif
         return S6_CYCLE_END;
     }
-    else
+
+    if (hasReachedDesiredPosition())
     {
-        return S4_DEPTH_MOVE;
+        SetArm(current_x, current_y + 1.0, GetCorrectedHeight(
+                    current_z, inductance_delta), -90);
     }
+
+    return S4_DEPTH_MOVE;
 }
 
 MetalScanner::scan_state MetalScanner::S5_Run(void)
 {
-    if (hasReachedDesiredPosition())
-    {
-        SetArm(current_x - 1.0, current_y, GetCorrectedHeight(
-                    current_z, inductance_delta), -90);
-    }
-
     if (current_x <= origin_x)
     {
 #ifdef METAL_SCANNER_DEBUG
@@ -283,10 +273,14 @@ MetalScanner::scan_state MetalScanner::S5_Run(void)
 #endif
         return S4_DEPTH_MOVE;
     }
-    else
+
+    if (hasReachedDesiredPosition())
     {
-        return S5_HORIZONTAL_MOVE_BACK;
+        SetArm(current_x - 1.0, current_y, GetCorrectedHeight(
+                    current_z, inductance_delta), -90);
     }
+
+    return S5_HORIZONTAL_MOVE_BACK;
 }
 
 MetalScanner::scan_state MetalScanner::S6_Run(void)
@@ -324,6 +318,5 @@ MetalScanner::scan_state MetalScanner::S7_Run(void)
         Serial.println("Scan complete!");
     }
 #endif
-
     return S7_SCAN_FINISHED;
 }
