@@ -32,6 +32,7 @@ class MetalScanner : public ArmController {
         void Update(uint16_t time_since_last_update_ms);
         bool isScanComplete(void);
         void ResetScan(void);
+        float GetOutOfBoundsPercentage(void);
 
     private:
 
@@ -68,6 +69,8 @@ class MetalScanner : public ArmController {
         float current_x;
         float current_y;
         float current_z;
+        uint32_t move_counter;
+        uint32_t out_of_bounds_counter;
 
         //Default settings
         const float DEFAULT_DELTA_uH = 0.25;
