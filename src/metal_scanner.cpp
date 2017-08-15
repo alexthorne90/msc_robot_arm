@@ -153,6 +153,15 @@ void MetalScanner::ResetScan(void)
     next_state = S0_IDLE;
 }
 
+float MetalScanner::GetOutOfBoundsPercentage(void)
+{
+    if (move_counter <= 0)
+    {
+        return 0;
+    }
+    return ((float)out_of_bounds_counter / (float)move_counter * 100.0);
+}
+
 // Private functions ***********************************************************
 float MetalScanner::GetCorrectedHeight(float current_z, float inductance)
 {
@@ -160,6 +169,7 @@ float MetalScanner::GetCorrectedHeight(float current_z, float inductance)
     if (inductance >= (desired_delta_uH + uH_tolerance))
     {
         corrected_z += height_correction_mm;
+        out_of_bounds_counter ++;
 #ifdef METAL_SCANNER_DEBUG
         Serial.print("Inductance corrected height up to ");
         Serial.println(corrected_z);
@@ -168,17 +178,21 @@ float MetalScanner::GetCorrectedHeight(float current_z, float inductance)
     if (inductance <= (desired_delta_uH - uH_tolerance))
     {
         corrected_z -= height_correction_mm;
+        out_of_bounds_counter ++;
 #ifdef METAL_SCANNER_DEBUG
         Serial.print("Inductance corrected height down to ");
         Serial.println(corrected_z);
 #endif
     }
+    move_counter ++;
     return corrected_z;
 }
 
 MetalScanner::scan_state MetalScanner::S0_Run(void)
 {
     current_cycle_count = 1;
+    move_counter = 0;
+    out_of_bounds_counter = 0;
     return S1_MOVE_ABOVE_ORIGIN;
 }
 
