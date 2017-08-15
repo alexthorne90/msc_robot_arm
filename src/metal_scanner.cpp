@@ -17,6 +17,8 @@ MetalScanner::MetalScanner(void) : ArmController()
     horizontal_desired_travel_mm = DEFAULT_HORIZONTAL_DESIRED_TRAVEL_MM;
     depth_desired_travel_mm = DEFAULT_DEPTH_DESIRED_TRAVEL_MM;
     depth_scan_increment_mm = DEFAULT_DEPTH_SCAN_INCREMENT_MM;
+    travel_increment_mm = DEFAULT_TRAVEL_INCREMENT_MM;
+    height_correction_mm = DEFAULT_HEIGHT_CORRECTION_MM;
     current_state = S0_IDLE;
     next_state = S0_IDLE;
     transitioned_state = false;
@@ -67,9 +69,21 @@ uint8_t MetalScanner::SetDesiredDepthTravelMM(float depth_travel)
     return 0;
 }
 
-uint8_t MetalScanner::SetDepthScanIncrement(float depth_increment)
+uint8_t MetalScanner::SetDepthScanIncrementMM(float depth_increment)
 {
     depth_scan_increment_mm = depth_increment;
+    return 0;
+}
+
+uint8_t MetalScanner::SetTravelIncrementMM(float travel_increment)
+{
+    travel_increment_mm = travel_increment;
+    return 0;
+}
+
+uint8_t MetalScanner::SetHeightCorrectionMM(float height_correction)
+{
+    height_correction_mm = height_correction;
     return 0;
 }
 
@@ -145,7 +159,7 @@ float MetalScanner::GetCorrectedHeight(float current_z, float inductance)
     float corrected_z = current_z;
     if (inductance >= (desired_delta_uH + uH_tolerance))
     {
-        corrected_z += 1.0;
+        corrected_z += height_correction_mm;
 #ifdef METAL_SCANNER_DEBUG
         Serial.print("Inductance corrected height up to ");
         Serial.println(corrected_z);
@@ -153,7 +167,7 @@ float MetalScanner::GetCorrectedHeight(float current_z, float inductance)
     }
     if (inductance <= (desired_delta_uH - uH_tolerance))
     {
-        corrected_z -= 1.0;
+        corrected_z -= height_correction_mm;
 #ifdef METAL_SCANNER_DEBUG
         Serial.print("Inductance corrected height down to ");
         Serial.println(corrected_z);
@@ -172,7 +186,8 @@ MetalScanner::scan_state MetalScanner::S1_Run(void)
 {
     if (transitioned_state)
     {
-        SetArm(origin_x, origin_y, origin_z + 60.0, -90);
+        SetArm(origin_x, origin_y, origin_z + DISTANCE_ABOVE_ORIGIN_START_MM,
+                -90);
     }
 
     if (hasReachedDesiredPosition())
@@ -189,14 +204,14 @@ MetalScanner::scan_state MetalScanner::S2_Run(void)
 {
     if (hasReachedDesiredPosition())
     {
-        SetArm(origin_x, origin_y, current_z - 1.0, -90);
+        SetArm(origin_x, origin_y, current_z - travel_increment_mm, -90);
     }
 
     if (inductance_delta > desired_delta_uH)
     {
 #ifdef METAL_SCANNER_DEBUG
         Serial.print("Height found at z = ");
-        Serial.print(current_z - 1.0);
+        Serial.print(current_z - travel_increment_mm);
         Serial.print(" current inductance = ");
         Serial.print(current_inductance);
         Serial.print(" reference = ");
@@ -227,7 +242,7 @@ MetalScanner::scan_state MetalScanner::S3_Run(void)
 
     if (hasReachedDesiredPosition())
     {
-        SetArm(current_x + 1.0, current_y, GetCorrectedHeight(
+        SetArm(current_x + travel_increment_mm, current_y, GetCorrectedHeight(
                     current_z, inductance_delta), -90);
     }
 
@@ -252,7 +267,7 @@ MetalScanner::scan_state MetalScanner::S4_Run(void)
 
     if (hasReachedDesiredPosition())
     {
-        SetArm(current_x, current_y + 1.0, GetCorrectedHeight(
+        SetArm(current_x, current_y + travel_increment_mm, GetCorrectedHeight(
                     current_z, inductance_delta), -90);
     }
 
@@ -276,7 +291,7 @@ MetalScanner::scan_state MetalScanner::S5_Run(void)
 
     if (hasReachedDesiredPosition())
     {
-        SetArm(current_x - 1.0, current_y, GetCorrectedHeight(
+        SetArm(current_x - travel_increment_mm, current_y, GetCorrectedHeight(
                     current_z, inductance_delta), -90);
     }
 

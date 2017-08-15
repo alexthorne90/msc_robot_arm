@@ -26,7 +26,9 @@ class MetalScanner : public ArmController {
         uint8_t SetInductanceDeltaTolerance(float tolerance);
         uint8_t SetDesiredHorizontalTravelMM(float horizontal_travel);
         uint8_t SetDesiredDepthTravelMM(float depth_travel);
-        uint8_t SetDepthScanIncrement(float depth_increment);
+        uint8_t SetDepthScanIncrementMM(float depth_increment);
+        uint8_t SetTravelIncrementMM(float travel_increment);
+        uint8_t SetHeightCorrectionMM(float height_correction);
         void Update(uint16_t time_since_last_update_ms);
         bool isScanComplete(void);
         void ResetScan(void);
@@ -55,6 +57,8 @@ class MetalScanner : public ArmController {
         float horizontal_desired_travel_mm;
         float depth_desired_travel_mm;
         float depth_scan_increment_mm;
+        float travel_increment_mm;
+        float height_correction_mm;
         scan_state current_state;
         scan_state next_state;
         bool transitioned_state;
@@ -71,6 +75,9 @@ class MetalScanner : public ArmController {
         const float DEFAULT_HORIZONTAL_DESIRED_TRAVEL_MM = 50;
         const float DEFAULT_DEPTH_DESIRED_TRAVEL_MM = 25;
         const float DEFAULT_DEPTH_SCAN_INCREMENT_MM = 5;
+        const float DEFAULT_TRAVEL_INCREMENT_MM = 1.0;
+        const float DEFAULT_HEIGHT_CORRECTION_MM = 1.0;
+        const float DISTANCE_ABOVE_ORIGIN_START_MM = 60.0;
 
         //Private helper functions
         float GetCorrectedHeight(float current_z, float inductance);
