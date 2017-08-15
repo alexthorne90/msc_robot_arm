@@ -28,8 +28,21 @@ class MetalScanner : public ArmController {
         uint8_t SetDesiredDepthTravelMM(float depth_travel);
         uint8_t SetDepthScanIncrement(float depth_increment);
         void Update(uint16_t time_since_last_update_ms);
+        bool isScanComplete(void);
+        void ResetScan(void);
 
     private:
+
+        typedef enum scan_state {
+            S0_IDLE,
+            S1_MOVE_ABOVE_ORIGIN,
+            S2_FIND_HEIGHT,
+            S3_HORIZONTAL_MOVE_FWD,
+            S4_DEPTH_MOVE,
+            S5_HORIZONTAL_MOVE_BACK,
+            S6_CYCLE_END,
+            S7_SCAN_FINISHED
+        } scan_state;
 
         //Private variables
         MetalDetector metal_detector;
@@ -42,6 +55,15 @@ class MetalScanner : public ArmController {
         float horizontal_desired_travel_mm;
         float depth_desired_travel_mm;
         float depth_scan_increment_mm;
+        scan_state current_state;
+        scan_state next_state;
+        bool transitioned_state;
+        uint16_t current_cycle_count;
+        float current_inductance;
+        float inductance_delta;
+        float current_x;
+        float current_y;
+        float current_z;
 
         //Default settings
         const float DEFAULT_DELTA_uH = 0.25;
@@ -51,6 +73,15 @@ class MetalScanner : public ArmController {
         const float DEFAULT_DEPTH_SCAN_INCREMENT_MM = 5;
 
         //Private helper functions
+        float GetCorrectedHeight(float current_z, float inductance);
+        scan_state S0_Run(void);
+        scan_state S1_Run(void);
+        scan_state S2_Run(void);
+        scan_state S3_Run(void);
+        scan_state S4_Run(void);
+        scan_state S5_Run(void);
+        scan_state S6_Run(void);
+        scan_state S7_Run(void);
 };
 
 #endif
