@@ -73,12 +73,12 @@ class MetalScanner : public ArmController {
         uint32_t out_of_bounds_counter;
 
         //Default settings
-        const float DEFAULT_DELTA_uH = 0.25;
-        const float DEFAULT_uH_TOLERANCE = 0.1;
-        const float DEFAULT_HORIZONTAL_DESIRED_TRAVEL_MM = 50;
-        const float DEFAULT_DEPTH_DESIRED_TRAVEL_MM = 25;
-        const float DEFAULT_DEPTH_SCAN_INCREMENT_MM = 5;
-        const float DEFAULT_TRAVEL_INCREMENT_MM = 1.0;
+        const float DEFAULT_DELTA_uH = 1.0;
+        const float DEFAULT_uH_TOLERANCE = 0.4;
+        const float DEFAULT_HORIZONTAL_DESIRED_TRAVEL_MM = 0;
+        const float DEFAULT_DEPTH_DESIRED_TRAVEL_MM = 0;
+        const float DEFAULT_DEPTH_SCAN_INCREMENT_MM = 0;
+        const float DEFAULT_TRAVEL_INCREMENT_MM = 0.5;
         const float DEFAULT_HEIGHT_CORRECTION_MM = 1.0;
         const float DISTANCE_ABOVE_ORIGIN_START_MM = 60.0;
 
