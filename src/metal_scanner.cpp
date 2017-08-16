@@ -11,6 +11,9 @@
 MetalScanner::MetalScanner(void) : ArmController()
 {
 	//initialize
+    origin_x = (X_MAX_BOUNDARY + X_MIN_BOUNDARY) / 2;
+    origin_y = (Y_MAX_BOUNDARY + Y_MIN_BOUNDARY) / 2;
+    origin_z = (Z_MAX_BOUNDARY + Z_MIN_BOUNDARY) / 2;
     reference_inductance = 0;
     desired_delta_uH = DEFAULT_DELTA_uH;
     uH_tolerance = DEFAULT_uH_TOLERANCE;
@@ -39,6 +42,12 @@ void MetalScanner::SetReferenceInductance(void)
 
 uint8_t MetalScanner::SetScanOrigin(float x, float y, float z)
 {
+    if (x > X_MAX_BOUNDARY || x < X_MIN_BOUNDARY)
+        return 1;
+    if (y > Y_MAX_BOUNDARY || y < Y_MIN_BOUNDARY)
+        return 1;
+    if (z > Z_MAX_BOUNDARY || z < Z_MIN_BOUNDARY)
+        return 1;
     origin_x = x;
     origin_y = y;
     origin_z = z;
@@ -47,42 +56,59 @@ uint8_t MetalScanner::SetScanOrigin(float x, float y, float z)
 
 uint8_t MetalScanner::SetDesiredInductanceDelta(float inductance)
 {
+    if (inductance < 0 || inductance > 3.0)
+        return 1;
     desired_delta_uH = inductance;
     return 0;
 }
 
 uint8_t MetalScanner::SetInductanceDeltaTolerance(float tolerance)
 {
+    if (tolerance < 0)
+        return 1;
     uH_tolerance = tolerance;
     return 0;
 }
 
 uint8_t MetalScanner::SetDesiredHorizontalTravelMM(float horizontal_travel)
 {
+    if (horizontal_travel > (X_MAX_BOUNDARY - X_MIN_BOUNDARY) ||
+            horizontal_travel < 0)
+        return 1;
     horizontal_desired_travel_mm = horizontal_travel;
     return 0;
 }
 
 uint8_t MetalScanner::SetDesiredDepthTravelMM(float depth_travel)
 {
+    if (depth_travel > (Y_MAX_BOUNDARY - Y_MIN_BOUNDARY) ||
+            depth_travel < 0)
+        return 1;
     depth_desired_travel_mm = depth_travel;
     return 0;
 }
 
 uint8_t MetalScanner::SetDepthScanIncrementMM(float depth_increment)
 {
+    if (depth_increment > (Y_MAX_BOUNDARY - Y_MIN_BOUNDARY) ||
+            depth_increment < 0)
+        return 1;
     depth_scan_increment_mm = depth_increment;
     return 0;
 }
 
 uint8_t MetalScanner::SetTravelIncrementMM(float travel_increment)
 {
+    if (travel_increment_mm > MAX_TRAVEL_INCREMENT || travel_increment_mm < 0)
+        return 1;
     travel_increment_mm = travel_increment;
     return 0;
 }
 
 uint8_t MetalScanner::SetHeightCorrectionMM(float height_correction)
 {
+    if (height_correction > MAX_HEIGHT_ADJUSTMENT || height_correction_mm < 0)
+        return 1;
     height_correction_mm = height_correction;
     return 0;
 }
@@ -95,6 +121,9 @@ void MetalScanner::Update(uint16_t time_since_last_update_ms)
     current_x = GetCurrentX();
     current_y = GetCurrentY();
     current_z = GetCurrentZ();
+
+    if (!isScanAreaValid())
+        return;
 
     switch (current_state)
     {
@@ -348,4 +377,13 @@ MetalScanner::scan_state MetalScanner::S7_Run(void)
     }
 #endif
     return S7_SCAN_FINISHED;
+}
+
+bool MetalScanner::isScanAreaValid(void)
+{
+    if ((origin_x + horizontal_desired_travel_mm) > X_MAX_BOUNDARY)
+        return false;
+    if ((origin_y + depth_desired_travel_mm) > Y_MAX_BOUNDARY)
+        return false;
+    return true;
 }

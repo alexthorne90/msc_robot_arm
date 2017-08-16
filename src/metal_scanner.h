@@ -82,6 +82,16 @@ class MetalScanner : public ArmController {
         const float DEFAULT_HEIGHT_CORRECTION_MM = 1.0;
         const float DISTANCE_ABOVE_ORIGIN_START_MM = 60.0;
 
+        //Boundaries
+        const float X_MIN_BOUNDARY = -130.0;
+        const float X_MAX_BOUNDARY = 130.0;
+        const float Y_MIN_BOUNDARY = 80.0;
+        const float Y_MAX_BOUNDARY = 230.0;
+        const float Z_MIN_BOUNDARY = 5.0;
+        const float Z_MAX_BOUNDARY = 100.0;
+        const float MAX_TRAVEL_INCREMENT = 14.0;
+        const float MAX_HEIGHT_ADJUSTMENT = 5.0;
+
         //Private helper functions
         float GetCorrectedHeight(float current_z, float inductance);
         scan_state S0_Run(void);
@@ -92,6 +102,7 @@ class MetalScanner : public ArmController {
         scan_state S5_Run(void);
         scan_state S6_Run(void);
         scan_state S7_Run(void);
+        bool isScanAreaValid(void);
 };
 
 #endif
