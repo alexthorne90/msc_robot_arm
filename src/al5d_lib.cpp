@@ -28,8 +28,6 @@ void Al5d::AttachMotors()
             SHOULDER_SERVO_MAX_POS);
     elbow_servo.attach(ELBOW_PIN, ELBOW_SERVO_MIN_POS, ELBOW_SERVO_MAX_POS);
     wrist_servo.attach(WRIST_PIN, WRIST_SERVO_MIN_POS, WRIST_SERVO_MAX_POS);
-    gripper_servo.attach(GRIPPER_PIN, GRIPPER_SERVO_MIN_POS,
-            GRIPPER_SERVO_MAX_POS);
 }
 
 void Al5d::SetHomePosition()

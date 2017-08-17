@@ -49,7 +49,6 @@ class Al5d {
         Servo elbow_servo;
         Servo shoulder_servo;
         Servo wrist_servo;
-        Servo gripper_servo;
         //Private helper functions
         bool ServoPulseOutOfBounds(float base, float shoulder, float elbow,
                 float wrist);
@@ -59,7 +58,6 @@ class Al5d {
         const uint8_t SHOULDER_PIN  = 3;
         const uint8_t ELBOW_PIN     = 10;
         const uint8_t WRIST_PIN     = 13;
-        const uint8_t GRIPPER_PIN   = 12;
 
         //Servo motor "home" positions
         const float BASE_SERVO_HOME_US      = 1510.0;
@@ -91,8 +89,6 @@ class Al5d {
         const uint16_t ELBOW_SERVO_MAX_POS      = 2410;
         const uint16_t WRIST_SERVO_MIN_POS      = 553;
         const uint16_t WRIST_SERVO_MAX_POS      = 2520;
-        const uint16_t GRIPPER_SERVO_MIN_POS    = 1000;
-        const uint16_t GRIPPER_SERVO_MAX_POS    = 2000;
 
         //Servo home position update delay
         const uint8_t SERVO_UPDATE_DELAY_MS     = 100;
