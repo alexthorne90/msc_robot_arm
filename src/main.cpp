@@ -1,38 +1,23 @@
 #include <Arduino.h>
+#include "scheduler.h"
 
-static const int UPDATE_PERIOD_MS = 200;
-static unsigned long last_update_millis = 0;
+Scheduler scheduler;
 
-bool isTimeForUpdate(void);
-void Update(void);
+void UpdateFunction(void);
 
 void setup()
 {
-	Serial.begin(115200);
-	delay(1000);
-    last_update_millis = millis();
-	Serial.println("Hello world");
+    Serial.begin(115200);
+    Serial.println("Begin");
+    scheduler.ScheduleFunction(UpdateFunction, 2000);
 }
 
 void loop()
 {
-    if (isTimeForUpdate())
-    {
-        Update();
-    }
+    scheduler.Update();
 }
 
-bool isTimeForUpdate(void)
+void UpdateFunction(void)
 {
-    unsigned long current_millis = millis();
-    bool is_time = (current_millis >= (last_update_millis + UPDATE_PERIOD_MS));
-    if (is_time)
-    {
-        last_update_millis = current_millis;
-    }
-    return is_time;
-}
-
-void Update(void)
-{
+    Serial.println("I got called!");
 }
