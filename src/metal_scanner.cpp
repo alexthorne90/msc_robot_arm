@@ -122,6 +122,14 @@ void MetalScanner::Update(uint16_t time_since_last_update_ms)
     current_y = GetCurrentY();
     current_z = GetCurrentZ();
 
+    if (current_state == S3_HORIZONTAL_MOVE_FWD ||
+            current_state == S4_DEPTH_MOVE ||
+            current_state == S5_HORIZONTAL_MOVE_BACK)
+    {
+        Serial.print("Inductance delta ");
+        Serial.println(inductance_delta, 6);
+    }
+
     if (!isScanAreaValid())
         return;
 

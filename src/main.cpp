@@ -22,9 +22,9 @@ void setup()
         Serial.println("Invalid origin");
     if (scanner.SetDesiredHorizontalTravelMM(100))
         Serial.println("Invalid horiz travel");
-    if (scanner.SetDesiredDepthTravelMM(40))
+    if (scanner.SetDesiredDepthTravelMM(0))
         Serial.println("Invalid depth travel");
-    if (scanner.SetDepthScanIncrementMM(5))
+    if (scanner.SetDepthScanIncrementMM(0))
         Serial.println("Invalid depth scan inc");
     if (scanner.SetTravelIncrementMM(0.5))
         Serial.println("Invalid travel inc");
@@ -66,7 +66,6 @@ void Update(void)
         Serial.print("Out of bounds ");
         Serial.print(scanner.GetOutOfBoundsPercentage());
         Serial.println("%");
-        delay(2000);
-        scanner.ResetScan();
+        while(1);
     }
 }
