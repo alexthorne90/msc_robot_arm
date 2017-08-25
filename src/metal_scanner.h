@@ -1,11 +1,11 @@
 /**
- * @file metal_scanner_lib.h
+ * @file metal_scanner.h
  * @author Alex Thorne
  * @version 1.0
  */
 
-#ifndef METAL_SCANNER_LIB_H
-#define METAL_SCANNER_LIB_H
+#ifndef METAL_SCANNER_H
+#define METAL_SCANNER_H
 
 #include <Arduino.h>
 #include "arm_controller.h"

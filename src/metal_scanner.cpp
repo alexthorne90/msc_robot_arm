@@ -1,5 +1,5 @@
 /**
- * @file metal_scanner_lib.cpp
+ * @file metal_scanner.cpp
  * @author Alex Thorne
  * @version 1.0
  */
