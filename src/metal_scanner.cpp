@@ -6,8 +6,6 @@
 
 #include "metal_scanner.h"
 
-//#define METAL_SCANNER_DEBUG
-
 MetalScanner::MetalScanner(void) : ArmController()
 {
 	//initialize
