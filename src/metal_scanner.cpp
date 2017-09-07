@@ -6,6 +6,8 @@
 
 #include "metal_scanner.h"
 
+int float_compare(const void *val1, const void *val2);
+
 MetalScanner::MetalScanner(void) : ArmController()
 {
 	//initialize
@@ -26,8 +28,15 @@ void MetalScanner::HardwareSetup(void)
 
 void MetalScanner::SetReferenceInductance(void)
 {
-    metal_detector.Update();
-    reference_inductance = metal_detector.GetCh0InductanceuH();
+    float inductance_vals[20];
+    for (uint8_t i = 0; i < 20; i ++)
+    {
+        delay(50);
+        metal_detector.Update();
+        inductance_vals[i] = metal_detector.GetCh0InductanceuH();
+    }
+    qsort(inductance_vals, 20, sizeof(inductance_vals[0]), float_compare);
+    reference_inductance = (inductance_vals[9] + inductance_vals[10]) / 2.0;
 }
 
 uint8_t MetalScanner::SetScanOrigin(float x, float y, float z)
@@ -58,4 +67,23 @@ uint8_t MetalScanner::SetInductanceDeltaTolerance(float tolerance)
         return 1;
     uH_tolerance = tolerance;
     return 0;
+}
+
+int float_compare(const void *val1, const void *val2)
+{
+    float fval1 = *((float *)val1);
+    float fval2 = *((float *)val2);
+
+    if (fval1 < fval2)
+    {
+        return -1;
+    }
+    else if (fval1 > fval2)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
