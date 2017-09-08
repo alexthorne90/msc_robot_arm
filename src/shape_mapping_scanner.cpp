@@ -17,6 +17,7 @@ ShapeMappingScanner::ShapeMappingScanner(void) : MetalScanner()
     transitioned_state = false;
     current_scan_dir = X_FORWARD;
     edge_counter = 0;
+    set_arm_error = 0;
 }
 
 void ShapeMappingScanner::Update(uint16_t time_since_last_update_ms)
@@ -66,6 +67,12 @@ void ShapeMappingScanner::Update(uint16_t time_since_last_update_ms)
         case S11_SCAN_COMPLETE:
             next_state = S11_Run();
             break;
+        case S12_EDGE_OUT_OF_BOUNDS:
+            next_state = S12_Run();
+            break;
+        case S13_SCAN_INVALID:
+            next_state = S13_Run();
+            break;
         default:
             break;
     }
@@ -83,7 +90,7 @@ void ShapeMappingScanner::Update(uint16_t time_since_last_update_ms)
     }
     current_state = next_state;
 
-    ArmController::Update(time_since_last_update_ms);
+    set_arm_error = ArmController::Update(time_since_last_update_ms);
 }
 
 bool ShapeMappingScanner::isScanComplete(void)
@@ -147,6 +154,7 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S0_Run(void)
     edge_y = 0;
     edge_z = 0;
     edge_counter = 0;
+    set_arm_error = 0;
     return S1_MOVE_ABOVE_ORIGIN;
 }
 
@@ -161,6 +169,10 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S1_Run(void)
     if (hasReachedDesiredPosition())
     {
         return S2_FIND_HEIGHT;
+    }
+    else if (set_arm_error)
+    {
+        return S12_EDGE_OUT_OF_BOUNDS;
     }
     return S1_MOVE_ABOVE_ORIGIN;
 }
@@ -184,16 +196,17 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S2_Run(void)
 #endif
         return S3_SCANNING;
     }
-    else
+    else if (set_arm_error)
     {
-#ifdef SHAPE_MAPPING_SCANNER_DEBUG
-        Serial.print("Lowering - Current inductance = ");
-        Serial.print(current_inductance);
-        Serial.print(" reference = ");
-        Serial.println(reference_inductance);
-#endif
-        return S2_FIND_HEIGHT;
+        return S12_EDGE_OUT_OF_BOUNDS;
     }
+#ifdef SHAPE_MAPPING_SCANNER_DEBUG
+    Serial.print("Lowering - Current inductance = ");
+    Serial.print(current_inductance);
+    Serial.print(" reference = ");
+    Serial.println(reference_inductance);
+#endif
+    return S2_FIND_HEIGHT;
 }
 
 ShapeMappingScanner::scan_state ShapeMappingScanner::S3_Run(void)
@@ -214,6 +227,10 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S3_Run(void)
         Serial.println(current_z);
 #endif
         return S4_BEGIN_EDGE_TEST;
+    }
+    else if (set_arm_error)
+    {
+        return S12_EDGE_OUT_OF_BOUNDS;
     }
 
     if (hasReachedDesiredPosition())
@@ -254,6 +271,10 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S5_Run(void)
         Serial.println(")");
 #endif
         return S6_EDGE_CONFIRMED;
+    }
+    else if (set_arm_error)
+    {
+        return S12_EDGE_OUT_OF_BOUNDS;
     }
 
     if (hasReachedDesiredPosition())
@@ -300,6 +321,10 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S7_Run(void)
         {
             return S5_EDGE_TEST_LOWERING;
         }
+    }
+    else if (set_arm_error)
+    {
+        return S12_EDGE_OUT_OF_BOUNDS;
     }
     return S7_EDGE_TEST_POSITION_INC;
 }
@@ -386,6 +411,27 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S11_Run(void)
 //#endif
     }
     return S11_SCAN_COMPLETE;
+}
+
+ShapeMappingScanner::scan_state ShapeMappingScanner::S12_Run(void)
+{
+    if (transitioned_state)
+    {
+        MapOutOfBoundsEdge();
+        edge_counter ++;
+        SetArm(current_x, current_y, current_z + HEIGHT_SAFETY_DIST_MM, -90);
+    }
+
+    if (hasReachedDesiredPosition())
+    {
+        return S10_READY_NEXT_SCAN;
+    }
+    return S12_EDGE_OUT_OF_BOUNDS;
+}
+
+ShapeMappingScanner::scan_state ShapeMappingScanner::S13_Run(void)
+{
+    return S13_SCAN_INVALID;
 }
 
 bool ShapeMappingScanner::hasDetectedEdge(void)
@@ -532,6 +578,25 @@ void ShapeMappingScanner::SetArmWithNextScanOrigin(void)
         default:
             SetArm(origin_x, origin_y, origin_z + DISTANCE_ABOVE_ORIGIN_START_MM,
                     -90);
+            break;
+    }
+}
+
+void ShapeMappingScanner::MapOutOfBoundsEdge(void)
+{
+    switch (current_scan_dir)
+    {
+        case X_FORWARD:
+        case X_BACKWARD:
+            edge_map[edge_counter].x_coordinate = -1;
+            edge_map[edge_counter].y_coordinate = current_y;
+            break;
+        case Y_FORWARD:
+        case Y_BACKWARD:
+            edge_map[edge_counter].x_coordinate = current_x;
+            edge_map[edge_counter].y_coordinate = -1;
+            break;
+        default:
             break;
     }
 }
