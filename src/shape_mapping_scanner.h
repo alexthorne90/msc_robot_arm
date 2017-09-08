@@ -44,7 +44,8 @@ class ShapeMappingScanner : public MetalScanner {
             S10_READY_NEXT_SCAN,
             S11_SCAN_COMPLETE,
             S12_EDGE_OUT_OF_BOUNDS,
-            S13_SCAN_INVALID
+            S13_SCAN_INVALID,
+            S14_VALIDATE_HEIGHT
         } scan_state;
 
         typedef enum scan_direction {
@@ -64,6 +65,7 @@ class ShapeMappingScanner : public MetalScanner {
         const float HEIGHT_SAFETY_DIST_MM = 20.0;
         const uint32_t EDGE_DETECTION_COUNT = 2;
         static const uint8_t NUM_EDGES = 12;
+        const uint8_t HEIGHT_VALIDATION_COUNT = 5;
 
         //Private variables
         float depth_scan_increment_mm;
@@ -86,6 +88,7 @@ class ShapeMappingScanner : public MetalScanner {
         uint8_t edge_counter;
         edge_point edge_map[NUM_EDGES];
         uint8_t set_arm_error;
+        uint8_t in_range_counter;
 
         //Private helper functions
         float GetCorrectedHeight(float current_z, float inductance);
@@ -103,6 +106,7 @@ class ShapeMappingScanner : public MetalScanner {
         scan_state S11_Run(void);
         scan_state S12_Run(void);
         scan_state S13_Run(void);
+        scan_state S14_Run(void);
         bool hasDetectedEdge(void);
         bool isInductanceTooLow(void);
         bool hasPassedEndOfEdgeTestRange(void);

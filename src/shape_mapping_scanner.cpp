@@ -73,6 +73,9 @@ void ShapeMappingScanner::Update(uint16_t time_since_last_update_ms)
         case S13_SCAN_INVALID:
             next_state = S13_Run();
             break;
+        case S14_VALIDATE_HEIGHT:
+            next_state = S14_Run();
+            break;
         default:
             break;
     }
@@ -194,7 +197,7 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S2_Run(void)
         Serial.print(" reference = ");
         Serial.println(reference_inductance);
 #endif
-        return S3_SCANNING;
+        return S14_VALIDATE_HEIGHT;
     }
     else if (set_arm_error)
     {
@@ -432,6 +435,35 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S12_Run(void)
 ShapeMappingScanner::scan_state ShapeMappingScanner::S13_Run(void)
 {
     return S13_SCAN_INVALID;
+}
+
+ShapeMappingScanner::scan_state ShapeMappingScanner::S14_Run(void)
+{
+    if (transitioned_state)
+    {
+        in_range_counter = 0;
+    }
+    in_range_counter ++;
+#ifdef SHAPE_MAPPING_SCANNER_DEBUG
+    Serial.print("Validating height, inductance delta = ");
+    Serial.println(inductance_delta, 4);
+#endif
+
+    if (isInductanceTooLow())
+    {
+#ifdef SHAPE_MAPPING_SCANNER_DEBUG
+        Serial.println("Inductance too low, move back to find height");
+#endif
+        return S2_FIND_HEIGHT;
+    }
+    else if (in_range_counter >= HEIGHT_VALIDATION_COUNT)
+    {
+#ifdef SHAPE_MAPPING_SCANNER_DEBUG
+        Serial.println("Counter reached, height validated, move to scan");
+#endif
+        return S3_SCANNING;
+    }
+    return S14_VALIDATE_HEIGHT;
 }
 
 bool ShapeMappingScanner::hasDetectedEdge(void)
