@@ -16,6 +16,7 @@ ShapeMappingScanner::ShapeMappingScanner(void) : MetalScanner()
     next_state = S0_IDLE;
     transitioned_state = false;
     current_scan_dir = X_FORWARD;
+    edge_counter = 0;
 }
 
 void ShapeMappingScanner::Update(uint16_t time_since_last_update_ms)
@@ -145,6 +146,7 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S0_Run(void)
     edge_x = 0;
     edge_y = 0;
     edge_z = 0;
+    edge_counter = 0;
     return S1_MOVE_ABOVE_ORIGIN;
 }
 
@@ -242,7 +244,7 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S5_Run(void)
     else if (isInductanceTooLow() &&
             (current_z <= edge_z - EDGE_TEST_HEIGHT_DROP_MM))
     {
-//#ifdef SHAPE_MAPPING_SCANNER_DEBUG
+#ifdef SHAPE_MAPPING_SCANNER_DEBUG
         Serial.print("Edge confirmed at (");
         Serial.print(current_x);
         Serial.print(", ");
@@ -250,7 +252,7 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S5_Run(void)
         Serial.print(", ");
         Serial.print(current_z);
         Serial.println(")");
-//#endif
+#endif
         return S6_EDGE_CONFIRMED;
     }
 
@@ -263,29 +265,19 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S5_Run(void)
 
 ShapeMappingScanner::scan_state ShapeMappingScanner::S6_Run(void)
 {
-
-    switch (current_scan_dir)
+    if (transitioned_state)
     {
-        case X_FORWARD:
-            current_scan_dir = X_BACKWARD;
-            return S10_READY_NEXT_SCAN;
-            break;
-        case X_BACKWARD:
-            current_scan_dir = Y_FORWARD;
-            return S10_READY_NEXT_SCAN;
-            break;
-        case Y_FORWARD:
-            current_scan_dir = Y_BACKWARD;
-            return S10_READY_NEXT_SCAN;
-            break;
-        case Y_BACKWARD:
-            current_scan_dir = X_FORWARD;
-            return S11_SCAN_COMPLETE;
-            break;
-        default:
-            return S11_SCAN_COMPLETE;
-            break;
+        edge_map[edge_counter].x_coordinate = current_x;
+        edge_map[edge_counter].y_coordinate = current_y;
+        edge_counter ++;
+        SetArm(current_x, current_y, current_z + HEIGHT_SAFETY_DIST_MM, -90);
     }
+
+    if (hasReachedDesiredPosition())
+    {
+        return S10_READY_NEXT_SCAN;
+    }
+    return S6_EDGE_CONFIRMED;
 }
 
 ShapeMappingScanner::scan_state ShapeMappingScanner::S7_Run(void)
@@ -344,18 +336,55 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S10_Run(void)
 {
     if (transitioned_state)
     {
-        SetArm(current_x, current_y, current_z + HEIGHT_SAFETY_DIST_MM, -90);
+        switch (current_scan_dir)
+        {
+            case X_FORWARD:
+                current_scan_dir = X_BACKWARD;
+                break;
+            case X_BACKWARD:
+                current_scan_dir = Y_FORWARD;
+                break;
+            case Y_FORWARD:
+                current_scan_dir = Y_BACKWARD;
+                break;
+            case Y_BACKWARD:
+                current_scan_dir = X_FORWARD;
+                break;
+            default:
+                break;
+        }
+        SetArmWithNextScanOrigin();
     }
 
     if (hasReachedDesiredPosition())
     {
-        return S1_MOVE_ABOVE_ORIGIN;
+        if (edge_counter >= NUM_EDGES)
+        {
+            return S11_SCAN_COMPLETE;
+        }
+        else
+        {
+            return S2_FIND_HEIGHT;
+        }
     }
     return S10_READY_NEXT_SCAN;
 }
 
 ShapeMappingScanner::scan_state ShapeMappingScanner::S11_Run(void)
 {
+    if (transitioned_state)
+    {
+//#ifdef SHAPE_MAPPING_SCANNER_DEBUG
+        Serial.println("Shape edges:");
+        for (uint8_t i = 0; i < NUM_EDGES; i ++)
+        {
+            Serial.print("    ");
+            Serial.print(edge_map[i].x_coordinate);
+            Serial.print(" , ");
+            Serial.println(edge_map[i].y_coordinate);
+        }
+//#endif
+    }
     return S11_SCAN_COMPLETE;
 }
 
@@ -454,6 +483,55 @@ void ShapeMappingScanner::SetArmResettingScan(void)
             SetArm(current_x, (edge_y + origin_y) / 2.0, current_z, -90);
             break;
         default:
+            break;
+    }
+}
+
+void ShapeMappingScanner::SetArmWithNextScanOrigin(void)
+{
+    switch (edge_counter)
+    {
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+            //first scans all from origin
+            SetArm(origin_x, origin_y, origin_z + DISTANCE_ABOVE_ORIGIN_START_MM,
+                    -90);
+            break;
+        case 4:
+        case 5:
+            //second x
+            SetArm(origin_x, (0.75 * edge_map[2].y_coordinate) +
+                    (0.25 * edge_map[3].y_coordinate),
+                    origin_z + DISTANCE_ABOVE_ORIGIN_START_MM, -90);
+            break;
+        case 6:
+        case 7:
+            //second y
+            SetArm((0.75 * edge_map[0].x_coordinate) +
+                    (0.25 * edge_map[1].x_coordinate), origin_y,
+                    origin_z + DISTANCE_ABOVE_ORIGIN_START_MM, -90);
+            break;
+        case 8:
+        case 9:
+            //third x
+            SetArm(origin_x, (0.25 * edge_map[2].y_coordinate) +
+                    (0.75 * edge_map[3].y_coordinate),
+                    origin_z + DISTANCE_ABOVE_ORIGIN_START_MM, -90);
+            break;
+            break;
+        case 10:
+        case 11:
+            //third y
+            SetArm((0.25 * edge_map[0].x_coordinate) +
+                    (0.75 * edge_map[1].x_coordinate), origin_y,
+                    origin_z + DISTANCE_ABOVE_ORIGIN_START_MM, -90);
+            break;
+            break;
+        default:
+            SetArm(origin_x, origin_y, origin_z + DISTANCE_ABOVE_ORIGIN_START_MM,
+                    -90);
             break;
     }
 }

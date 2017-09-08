@@ -22,6 +22,12 @@ class ShapeMappingScanner : public MetalScanner {
         void ResetScan(void);
         float GetOutOfBoundsPercentage(void);
 
+        //Public types
+        typedef struct edge_point {
+            float x_coordinate;
+            float y_coordinate;
+        } edge_point;
+
     private:
 
         typedef enum scan_state {
@@ -46,6 +52,17 @@ class ShapeMappingScanner : public MetalScanner {
             Y_BACKWARD
         } scan_direction;
 
+        //Scan settings
+        const float DEFAULT_DEPTH_SCAN_INCREMENT_MM = 0;
+        const float TRAVEL_INCREMENT_MM = 0.5;
+        const float HEIGHT_CORRECTION_MM = 1.0;
+        const float EDGE_TEST_HEIGHT_DROP_MM = 2.5;
+        const float EDGE_TEST_HORIZ_INC_MM = 3.5;
+        const float EDGE_TEST_HORIZ_RANGE_MM = 14.0;
+        const float HEIGHT_SAFETY_DIST_MM = 20.0;
+        const uint32_t EDGE_DETECTION_COUNT = 2;
+        static const uint8_t NUM_EDGES = 12;
+
         //Private variables
         float depth_scan_increment_mm;
         scan_state current_state;
@@ -64,16 +81,8 @@ class ShapeMappingScanner : public MetalScanner {
         float edge_y;
         float edge_z;
         scan_direction current_scan_dir;
-
-        //Scan settings
-        const float DEFAULT_DEPTH_SCAN_INCREMENT_MM = 0;
-        const float TRAVEL_INCREMENT_MM = 0.5;
-        const float HEIGHT_CORRECTION_MM = 1.0;
-        const float EDGE_TEST_HEIGHT_DROP_MM = 2.5;
-        const float EDGE_TEST_HORIZ_INC_MM = 3.5;
-        const float EDGE_TEST_HORIZ_RANGE_MM = 14.0;
-        const float HEIGHT_SAFETY_DIST_MM = 20.0;
-        const uint32_t EDGE_DETECTION_COUNT = 2;
+        uint8_t edge_counter;
+        edge_point edge_map[NUM_EDGES];
 
         //Private helper functions
         float GetCorrectedHeight(float current_z, float inductance);
@@ -95,6 +104,7 @@ class ShapeMappingScanner : public MetalScanner {
         void SetArmScanning(void);
         void SetArmEdgeTestPosition(void);
         void SetArmResettingScan(void);
+        void SetArmWithNextScanOrigin(void);
 
 };
 
