@@ -291,8 +291,7 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S6_Run(void)
 {
     if (transitioned_state)
     {
-        edge_map[edge_counter].x_coordinate = current_x;
-        edge_map[edge_counter].y_coordinate = current_y;
+        MapEdge();
         edge_counter ++;
         SetArm(current_x, current_y, current_z + HEIGHT_SAFETY_DIST_MM, -90);
     }
@@ -610,6 +609,35 @@ void ShapeMappingScanner::SetArmWithNextScanOrigin(void)
         default:
             SetArm(origin_x, origin_y, origin_z + DISTANCE_ABOVE_ORIGIN_START_MM,
                     -90);
+            break;
+    }
+}
+
+void ShapeMappingScanner::MapEdge(void)
+{
+    switch (current_scan_dir)
+    {
+        case X_FORWARD:
+            edge_map[edge_counter].x_coordinate =
+                current_x - SENSOR_COIL_RADIUS_MM;;
+            edge_map[edge_counter].y_coordinate = current_y;
+            break;
+        case X_BACKWARD:
+            edge_map[edge_counter].x_coordinate =
+                current_x + SENSOR_COIL_RADIUS_MM;
+            edge_map[edge_counter].y_coordinate = current_y;
+            break;
+        case Y_FORWARD:
+            edge_map[edge_counter].x_coordinate = current_x;
+            edge_map[edge_counter].y_coordinate =
+                current_y - SENSOR_COIL_RADIUS_MM;
+            break;
+        case Y_BACKWARD:
+            edge_map[edge_counter].x_coordinate = current_x;
+            edge_map[edge_counter].y_coordinate =
+                current_y + SENSOR_COIL_RADIUS_MM;
+            break;
+        default:
             break;
     }
 }

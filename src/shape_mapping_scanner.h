@@ -66,6 +66,7 @@ class ShapeMappingScanner : public MetalScanner {
         const uint32_t EDGE_DETECTION_COUNT = 2;
         static const uint8_t NUM_EDGES = 12;
         const uint8_t HEIGHT_VALIDATION_COUNT = 5;
+        const float SENSOR_COIL_RADIUS_MM = 7.0;
 
         //Private variables
         float depth_scan_increment_mm;
@@ -114,6 +115,7 @@ class ShapeMappingScanner : public MetalScanner {
         void SetArmEdgeTestPosition(void);
         void SetArmResettingScan(void);
         void SetArmWithNextScanOrigin(void);
+        void MapEdge(void);
         void MapOutOfBoundsEdge(void);
 
 };
