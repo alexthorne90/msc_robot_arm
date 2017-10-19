@@ -1,10 +1,10 @@
 /**
- * @file al5d_lib.cpp
+ * @file al5d.cpp
  * @author Alex Thorne
  * @version 1.0
  */
 
-#include "al5d_lib.h"
+#include "al5d.h"
 
 //#define  AL5D_DEBUG
 

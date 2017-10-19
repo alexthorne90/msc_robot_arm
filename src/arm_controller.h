@@ -8,7 +8,7 @@
 #define ARM_CONTROLLER_H
 
 #include <Arduino.h>
-#include "al5d_lib.h"
+#include "al5d.h"
 
 class ArmController : public Al5d
 {

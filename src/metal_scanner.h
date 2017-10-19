@@ -9,7 +9,7 @@
 
 #include <Arduino.h>
 #include "arm_controller.h"
-#include "metal_detector_lib.h"
+#include "metal_detector.h"
 
 class MetalScanner : public ArmController {
 

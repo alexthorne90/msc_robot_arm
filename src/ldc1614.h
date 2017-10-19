@@ -1,11 +1,11 @@
 /**
- * @file ldc1614_lib.h
+ * @file ldc1614.h
  * @author Alex Thorne
  * @version 1.0
  */
 
-#ifndef LDC1614_LIB_H
-#define LDC1614_LIB_H
+#ifndef LDC1614_H
+#define LDC1614_H
 
 #include <Arduino.h>
 #include <Wire.h>

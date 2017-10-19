@@ -1,11 +1,11 @@
 /**
- * @file al5d_lib.h
+ * @file al5d.h
  * @author Alex Thorne
  * @version 1.0
  */
 
-#ifndef AL5D_LIB_H
-#define AL5D_LIB_H
+#ifndef AL5D_H
+#define AL5D_H
 
 #include <Arduino.h>
 #include <Servo.h>

@@ -1,14 +1,14 @@
 /**
- * @file metal_detector_lib.h
+ * @file metal_detector.h
  * @author Alex Thorne
  * @version 1.0
  */
 
-#ifndef METAL_DETECTOR_LIB_H
-#define METAL_DETECTOR_LIB_H
+#ifndef METAL_DETECTOR_H
+#define METAL_DETECTOR_H
 
 #include <Arduino.h>
-#include "ldc1614_lib.h"
+#include "ldc1614.h"
 
 class MetalDetector : public Ldc1614 {
 

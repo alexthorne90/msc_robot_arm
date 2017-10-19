@@ -1,10 +1,10 @@
 /**
- * @file metal_detector_lib.cpp
+ * @file metal_detector.cpp
  * @author Alex Thorne
  * @version 1.0
  */
 
-#include "metal_detector_lib.h"
+#include "metal_detector.h"
 
 //#define METAL_DETECTOR_DEBUG
 

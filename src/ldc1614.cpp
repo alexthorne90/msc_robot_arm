@@ -1,10 +1,10 @@
 /**
- * @file ldc1614_lib.cpp
+ * @file ldc1614.cpp
  * @author Alex Thorne
  * @version 1.0
  */
 
-#include "ldc1614_lib.h"
+#include "ldc1614.h"
 
 //#define LDC1614_DEBUG
 
