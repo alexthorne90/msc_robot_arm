@@ -401,7 +401,7 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S11_Run(void)
 {
     if (transitioned_state)
     {
-//#ifdef SHAPE_MAPPING_SCANNER_DEBUG
+#ifdef SHAPE_MAPPING_SCANNER_DEBUG
         Serial.println("Shape edges:");
         for (uint8_t i = 0; i < NUM_EDGES; i ++)
         {
@@ -410,7 +410,7 @@ ShapeMappingScanner::scan_state ShapeMappingScanner::S11_Run(void)
             Serial.print(" , ");
             Serial.println(edge_map[i].y_coordinate);
         }
-//#endif
+#endif
     }
     return S11_SCAN_COMPLETE;
 }
