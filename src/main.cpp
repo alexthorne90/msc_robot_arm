@@ -4,7 +4,7 @@
 #include "defined_area_scanner.h"
 
 static Scheduler scheduler;
-static const int UPDATE_PERIOD_MS = 50;
+static const int UPDATE_PERIOD_MS = 100;
 static void AppUpdate(void);
 
 // Scanner objects
