@@ -21,6 +21,7 @@ class ShapeMappingScanner : public MetalScanner {
         bool isScanComplete(void);
         void ResetScan(void);
         float GetOutOfBoundsPercentage(void);
+        void PrintEdgeMap(void);
 
         //Public types
         typedef struct edge_point {

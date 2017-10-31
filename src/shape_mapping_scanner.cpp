@@ -660,3 +660,17 @@ void ShapeMappingScanner::MapOutOfBoundsEdge(void)
             break;
     }
 }
+
+void ShapeMappingScanner::PrintEdgeMap(void)
+{
+    int i;
+    Serial.println("Edge points:");
+    for (i = 0; i < NUM_EDGES; i ++)
+    {
+        Serial.print("(");
+        Serial.print(edge_map[i].x_coordinate);
+        Serial.print(", ");
+        Serial.print(edge_map[i].y_coordinate);
+        Serial.println(")");
+    }
+}
